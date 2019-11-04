@@ -192,7 +192,7 @@ def create_tf_example(image: np.ndarray,
 
     """
     import tensorflow as tf
-    from object_detection.utils import dataset_util
+    from rastervision.object_detection import dataset_util
 
     class_keys = set(class_map.get_keys())
 

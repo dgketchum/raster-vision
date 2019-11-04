@@ -32,7 +32,7 @@ log = logging.getLogger(__name__)
 
 
 def save_debug_image(im, labels, class_map, output_path):
-    from object_detection.utils import visualization_utils as vis_util
+    from rastervision.object_detection import visualization_utils as vis_util
 
     npboxes = labels.get_npboxes()
     class_ids = labels.get_class_ids()
@@ -54,7 +54,7 @@ def save_debug_image(im, labels, class_map, output_path):
 
 def create_tf_example(image, window, labels, class_map, chip_id=''):
     import tensorflow as tf
-    from object_detection.utils import dataset_util
+    from rastervision.object_detection import dataset_util
 
     image = Image.fromarray(image)
     image_format = 'png'
