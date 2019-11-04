@@ -8,3 +8,5 @@ from rastervision.task.chip_classification import *
 from rastervision.task.chip_classification_config import *
 from rastervision.task.semantic_segmentation import *
 from rastervision.task.semantic_segmentation_config import *
+from rastervision.task.instance_segmentation import *
+from rastervision.task.instance_segmentation_config import *

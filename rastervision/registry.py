@@ -10,15 +10,18 @@ from rastervision.data.vector_source.default import (
 from rastervision.data.label_source.default import (
     ObjectDetectionLabelSourceDefaultProvider,
     ChipClassificationLabelSourceDefaultProvider,
-    SemanticSegmentationLabelSourceDefaultProvider)
+    SemanticSegmentationLabelSourceDefaultProvider,
+    InstanceSegmentationLabelSourceDefaultProvider)
 from rastervision.data.label_store.default import (
     ObjectDetectionGeoJSONStoreDefaultProvider,
     ChipClassificationGeoJSONStoreDefaultProvider,
-    SemanticSegmentationRasterStoreDefaultProvider)
+    SemanticSegmentationRasterStoreDefaultProvider,
+    InstanceSegmentationLabelStoreDefaultProvider)
 from rastervision.evaluation.default import (
     ObjectDetectionEvaluatorDefaultProvider,
     ChipClassificationEvaluatorDefaultProvider,
-    SemanticSegmentationEvaluatorDefaultProvider)
+    SemanticSegmentationEvaluatorDefaultProvider,
+    InstanceSegmentationEvaluatorDefaultProvider)
 
 
 class RegistryError(Exception):
@@ -42,6 +45,8 @@ class Registry:
             rv.task.ChipClassificationConfigBuilder,
             (rv.TASK, rv.SEMANTIC_SEGMENTATION):
             rv.task.SemanticSegmentationConfigBuilder,
+            (rv.TASK, rv.INSTANCE_SEGMENTATION):
+                rv.task.InstanceSegmentationConfigBuilder,
 
             # Raster Transformers
             (rv.RASTER_TRANSFORMER, rv.STATS_TRANSFORMER):
@@ -74,6 +79,8 @@ class Registry:
             rv.data.ObjectDetectionLabelSourceConfigBuilder,
             (rv.LABEL_SOURCE, rv.SEMANTIC_SEGMENTATION):
             rv.data.SemanticSegmentationLabelSourceConfigBuilder,
+            (rv.LABEL_SOURCE, rv.INSTANCE_SEGMENTATION):
+                rv.data.InstanceSegmentationLabelSourceConfigBuilder,
 
             # Label Source aliases provided for backward-compatibility
             (rv.LABEL_SOURCE, rv.OBJECT_DETECTION_GEOJSON):
@@ -82,6 +89,8 @@ class Registry:
             rv.data.ChipClassificationLabelSourceConfigBuilder,
             (rv.LABEL_SOURCE, rv.SEMANTIC_SEGMENTATION_RASTER):
             rv.data.SemanticSegmentationLabelSourceConfigBuilder,
+            (rv.LABEL_SOURCE, rv.INSTANCE_SEGMENTATION_RASTER):
+                rv.data.InstanceSegmentationLabelSourceConfigBuilder,
 
             # Label Stores
             (rv.LABEL_STORE, rv.OBJECT_DETECTION_GEOJSON):
@@ -90,6 +99,8 @@ class Registry:
             rv.data.ChipClassificationGeoJSONStoreConfigBuilder,
             (rv.LABEL_STORE, rv.SEMANTIC_SEGMENTATION_RASTER):
             rv.data.SemanticSegmentationRasterStoreConfigBuilder,
+            (rv.LABEL_STORE, rv.INSTANCE_SEGMENTATION_RASTER):
+                rv.data.InstanceSegmentationRasterStoreConfigBuilder,
 
             # Analyzers
             (rv.ANALYZER, rv.STATS_ANALYZER):
@@ -106,6 +117,8 @@ class Registry:
             rv.evaluation.ObjectDetectionEvaluatorConfigBuilder,
             (rv.EVALUATOR, rv.SEMANTIC_SEGMENTATION_EVALUATOR):
             rv.evaluation.SemanticSegmentationEvaluatorConfigBuilder,
+            (rv.EVALUATOR, rv.INSTANCE_SEGMENTATION_EVALUATOR):
+                rv.evaluation.InstanceSegmentationEvaluatorConfigBuilder,
         }
 
         if rv.backend.tf_available:
@@ -123,6 +136,9 @@ class Registry:
             key_val = (rv.BACKEND, rv.PYTORCH_SEMANTIC_SEGMENTATION)
             self._internal_config_builders[key_val] = \
                 rv.backend.PyTorchSemanticSegmentationConfigBuilder
+            key_val = (rv.BACKEND, rv.PYTORCH_INSTANCE_SEGMENTATION)
+            self._internal_config_builders[key_val] = \
+                rv.backend.PyTorchInstanceSegmentationConfigBuilder
             key_val = (rv.BACKEND, rv.PYTORCH_OBJECT_DETECTION)
             self._internal_config_builders[key_val] = \
                 rv.backend.PyTorchObjectDetectionConfigBuilder
@@ -137,19 +153,22 @@ class Registry:
         self._internal_default_label_sources = [
             ObjectDetectionLabelSourceDefaultProvider,
             ChipClassificationLabelSourceDefaultProvider,
-            SemanticSegmentationLabelSourceDefaultProvider
+            SemanticSegmentationLabelSourceDefaultProvider,
+            InstanceSegmentationLabelSourceDefaultProvider
         ]
 
         self._internal_default_label_stores = [
             ObjectDetectionGeoJSONStoreDefaultProvider,
             ChipClassificationGeoJSONStoreDefaultProvider,
-            SemanticSegmentationRasterStoreDefaultProvider
+            SemanticSegmentationRasterStoreDefaultProvider,
+            InstanceSegmentationLabelStoreDefaultProvider
         ]
 
         self._internal_default_evaluators = [
             ObjectDetectionEvaluatorDefaultProvider,
             ChipClassificationEvaluatorDefaultProvider,
-            SemanticSegmentationEvaluatorDefaultProvider
+            SemanticSegmentationEvaluatorDefaultProvider,
+            InstanceSegmentationEvaluatorDefaultProvider
         ]
 
         self.command_config_builders = {
@@ -235,6 +254,7 @@ class Registry:
             if key in [
                     rv.PYTORCH_CHIP_CLASSIFICATION,
                     rv.PYTORCH_SEMANTIC_SEGMENTATION,
+                    rv.PYTORCH_INSTANCE_SEGMENTATION,
                     rv.PYTORCH_OBJECT_DETECTION
             ]:
                 raise RegistryError(

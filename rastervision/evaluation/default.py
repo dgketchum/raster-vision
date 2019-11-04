@@ -51,3 +51,15 @@ class SemanticSegmentationEvaluatorDefaultProvider(EvaluatorDefaultProvider):
         return rv.EvaluatorConfig.builder(rv.SEMANTIC_SEGMENTATION_EVALUATOR) \
                                  .with_task(task) \
                                  .build()
+
+
+class InstanceSegmentationEvaluatorDefaultProvider(EvaluatorDefaultProvider):
+    @staticmethod
+    def is_default_for(task_type):
+        return task_type == rv.INSTANCE_SEGMENTATION
+
+    @staticmethod
+    def construct(task):
+        return rv.EvaluatorConfig.builder(rv.INSTANCE_SEGMENTATION_EVALUATOR) \
+                                 .with_task(task) \
+                                 .build()

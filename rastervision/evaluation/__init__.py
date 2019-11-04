@@ -16,3 +16,6 @@ from rastervision.evaluation.object_detection_evaluator import *
 from rastervision.evaluation.object_detection_evaluator_config import *
 from rastervision.evaluation.semantic_segmentation_evaluator import *
 from rastervision.evaluation.semantic_segmentation_evaluator_config import *
+from rastervision.evaluation.instance_segmentation_evaluation import InstanceSegmentationEvaluation
+from rastervision.evaluation.instance_segmentation_evaluator import *
+from rastervision.evaluation.instance_segmentation_evaluator_config import *

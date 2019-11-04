@@ -66,13 +66,13 @@ class InstanceSegmentationLabelSourceDefaultProvider(
         LabelSourceDefaultProvider):
     @staticmethod
     def handles(task_type, uri):
-        if task_type == rv.SEMANTIC_SEGMENTATION:
+        if task_type == rv.INSTANCE_SEGMENTATION:
             ext = os.path.splitext(uri)[1]
             return ext.lower() in ['.tif', '.tiff']
         return False
 
     @staticmethod
     def construct(uri):
-        return rv.LabelSourceConfig.builder(rv.SEMANTIC_SEGMENTATION) \
+        return rv.LabelSourceConfig.builder(rv.INSTANCE_SEGMENTATION) \
                                    .with_raster_source(uri) \
                                    .build()

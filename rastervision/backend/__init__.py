@@ -37,5 +37,10 @@ if pytorch_available:
     from rastervision.backend.pytorch_semantic_segmentation_config import (
         PyTorchSemanticSegmentationConfig,
         PyTorchSemanticSegmentationConfigBuilder)
+    from rastervision.backend.pytorch_instance_segmentation import (
+        PyTorchInstanceSegmentation)
+    from rastervision.backend.pytorch_instance_segmentation_config import (
+        PyTorchInstanceSegmentationConfig,
+        PyTorchInstanceSegmentationConfigBuilder)
     from rastervision.backend.pytorch_object_detection_config import (
         PyTorchObjectDetectionConfig, PyTorchObjectDetectionConfigBuilder)

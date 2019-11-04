@@ -2,29 +2,27 @@ import os
 
 import rastervision as rv
 
-aoi_path = 'AOIs/AOI_1_Rio/srcData/buildingLabels/Rio_OUTLINE_Public_AOI.geojson'
-
 RAW_URI = '/opt/data/training_data'
 PROCESSED_URI = os.path.join(RAW_URI, 'example')
 ROOT_URI = '/opt/data/training_data'
 
 
-class SemanticSegmentationExperiments(rv.ExperimentSet):
+class InstanceSegmentationExperiments(rv.ExperimentSet):
     def exp_main(self):
 
         train_scene_info = get_scene_info('train')
         val_scene_info = get_scene_info('val')
 
-        exp_id = 'idaho-espa-semseg'
+        exp_id = 'washington-inseg'
         classes = {'field': (1, 'green'), 'background': (0, 'white')}
 
-        task = rv.TaskConfig.builder(rv.SEMANTIC_SEGMENTATION) \
+        task = rv.TaskConfig.builder(rv.INSTANCE_SEGMENTATION) \
             .with_chip_size(300) \
             .with_chip_options(chips_per_scene=50) \
             .with_classes(classes) \
             .build()
 
-        backend = rv.BackendConfig.builder(rv.PYTORCH_SEMANTIC_SEGMENTATION) \
+        backend = rv.BackendConfig.builder(rv.PYTORCH_INSTANCE_SEGMENTATION) \
             .with_task(task) \
             .with_train_options(
             batch_size=8,
@@ -62,14 +60,14 @@ def make_scene(raster_uri, label_uri, task):
         .with_uri(label_uri)\
         .build()
 
-    label_source = rv.LabelSourceConfig.builder(rv.SEMANTIC_SEGMENTATION) \
+    label_source = rv.LabelSourceConfig.builder(rv.INSTANCE_SEGMENTATION) \
         .with_raster_source(label_raster_source) \
         .build()
 
     return rv.SceneConfig.builder() \
         .with_task(task) \
         .with_id(_id) \
-        .with_raster_source(raster_uri, channel_order=[0, 1, 2]) \
+        .with_raster_source(raster_uri, channel_order=[0, 1, 2, 3]) \
         .with_label_source(label_source) \
         .build()
 
