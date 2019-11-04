@@ -48,7 +48,7 @@ def get_random_sample_train_windows(label_store, chip_size, class_map, extent,
 
 
 class InstanceSegmentation(Task):
-    """Task-derived type that implements the semantic segmentation task."""
+    """Task-derived type that implements the instance segmentation task."""
 
     def get_train_windows(self, scene: Scene) -> List[Box]:
         """Get training windows covering a scene.
@@ -110,6 +110,7 @@ class InstanceSegmentation(Task):
         """
 
         def _process_scene(scene, type_, augment):
+            log.info('Making chips for {} scenes'.format(len(train_scenes)))
             with scene.activate():
                 data = TrainingData()
                 log.info('Making {} chips for scene: {}'.format(

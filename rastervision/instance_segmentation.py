@@ -2,19 +2,37 @@ import os
 
 import rastervision as rv
 
-RAW_URI = '/opt/data/training_data'
-PROCESSED_URI = os.path.join(RAW_URI, 'example')
-ROOT_URI = '/opt/data/training_data'
+if 'home' in os.getcwd():
+    home = os.path.expanduser('~')
+    ROOT_URI = os.path.join(home, 'field_extraction', 'training_data')
+    PROCESSED_URI = os.path.join(ROOT_URI, 'example')
+    TMP = os.environ['TMPDIR'] = os.path.join(ROOT_URI, 'tmp')
+    os.environ['TORCH_HOME'] = os.path.join(home, 'field_extraction', 'torche-cache')
+else:
+    ROOT_URI = '/opt/data/training_data'
+    PROCESSED_URI = os.path.join(ROOT_URI, 'example')
 
 
 class InstanceSegmentationExperiments(rv.ExperimentSet):
-    def exp_main(self):
+    def exp_main(self, test=True):
 
         train_scene_info = get_scene_info('train')
         val_scene_info = get_scene_info('val')
 
         exp_id = 'washington-inseg'
         classes = {'field': (1, 'green'), 'background': (0, 'white')}
+
+        if test:
+            exp_id += '-test'
+            debug = True
+            num_epochs = 1
+            batch_size = 2
+            train_scene_info = train_scene_info[0:1]
+            val_scene_info = val_scene_info[0:1]
+        else:
+            debug = True
+            num_epochs = 100
+            batch_size = 8
 
         task = rv.TaskConfig.builder(rv.INSTANCE_SEGMENTATION) \
             .with_chip_size(300) \
@@ -25,11 +43,11 @@ class InstanceSegmentationExperiments(rv.ExperimentSet):
         backend = rv.BackendConfig.builder(rv.PYTORCH_INSTANCE_SEGMENTATION) \
             .with_task(task) \
             .with_train_options(
-            batch_size=8,
+            batch_size=batch_size,
             lr=1e-4,
-            num_epochs=100,
+            num_epochs=num_epochs,
             model_arch='resnet50',
-            debug=True) \
+            debug=debug) \
             .build()
 
         train_scenes = [make_scene(x, y, task) for x, y in train_scene_info]
@@ -81,4 +99,6 @@ def get_scene_info(_type='train'):
 
 
 if __name__ == '__main__':
-    rv.main()
+    i = InstanceSegmentationExperiments().exp_main(test=True)
+    rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
+    # rv.main()

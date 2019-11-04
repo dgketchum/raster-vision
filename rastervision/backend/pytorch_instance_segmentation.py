@@ -77,15 +77,15 @@ def make_debug_chips(databunch, class_map, tmp_dir, train_uri, max_count=30):
 
 
 class PyTorchInstanceSegmentation(Backend):
-    """Instance segmentation backend using PyTorch and fastai."""
+    """Instance segmentation backend using PyTorch."""
 
     def __init__(self, task_config, backend_opts, train_opts):
         """Constructor.
 
         Args:
-            task_config: (SemanticSegmentationConfig)
+            task_config: (InstanceSegmentationConfig)
             backend_opts: (simple_backend_config.BackendOptions)
-            train_opts: (pytorch_semantic_segmentation_backend_config.TrainOptions)
+            train_opts: (pytorch_instance_segmentation_backend_config.TrainOptions)
         """
         self.task_config = task_config
         self.backend_opts = backend_opts
@@ -225,7 +225,7 @@ class PyTorchInstanceSegmentation(Backend):
         # Setup model
         num_labels = len(databunch.label_names)
         model = get_model(
-            self.train_opts.model_arch, num_labels, pretrained=True)
+            self.train_opts.model_arch, num_labels, pretrained=False)
         model = model.to(self.device)
         model_path = join(train_dir, 'model')
 
