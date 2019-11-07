@@ -92,8 +92,9 @@ class PyTorchInstanceSegmentation(Backend):
         self.train_opts = train_opts
         self.inf_learner = None
 
-        torch_cache_dir = '/opt/data/torch-cache'
-        os.environ['TORCH_HOME'] = torch_cache_dir
+        # TODO un-comment this code
+        # torch_cache_dir = '/opt/data/torch-cache'
+        # os.environ['TORCH_HOME'] = torch_cache_dir
 
         self.model = None
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -296,6 +297,7 @@ class PyTorchInstanceSegmentation(Backend):
             log.info('-----------------------------------------------------')
             log.info('epoch: {}'.format(epoch))
             start = time.time()
+            # TODO pass correct databunch format for instance_segmentation
             train_loss = train_epoch(model, self.device, databunch.train_dl,
                                      opt, loss_fn, step_scheduler)
             if epoch_scheduler:

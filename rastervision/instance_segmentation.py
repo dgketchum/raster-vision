@@ -99,6 +99,12 @@ def get_scene_info(_type='train'):
 
 
 if __name__ == '__main__':
-    i = InstanceSegmentationExperiments().exp_main(test=True)
-    rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
+    # i = InstanceSegmentationExperiments().exp_main(test=True)
+    # rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
     # rv.main()
+    cmd = '/home/dgketchum/field_extraction/training_data/train/washington-inseg-test/command-config-0.json'
+
+    rv.runner.CommandRunner.run(cmd)
+
+# ====================================== EOF =================================================================
+

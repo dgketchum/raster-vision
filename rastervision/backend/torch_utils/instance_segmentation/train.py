@@ -16,6 +16,8 @@ def train_epoch(model, device, data_loader, opt, loss_fn, step_scheduler=None):
             y = y.to(device)
 
             opt.zero_grad()
+            # TODO provide x as torch.utils.data.Dataset.__getitem__: (image, {target})
+            # instance_segmentation delivers x, y as (N, C, H, W), and (N, H, W)
             out = model(x)['out']
             loss = loss_fn(out, y)
             loss.backward()
