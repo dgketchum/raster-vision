@@ -38,14 +38,14 @@ log = logging.getLogger(__name__)
 
 
 def make_debug_chips(databunch, class_map, tmp_dir, train_uri, max_count=30):
-    """Save debug chips for a Databunch for a semantic segmentation dataset.
+    """Save debug chips for a Databunch for an instance segmentation dataset.
 
     This saves a plot for each example in the training and validation sets into
     train-debug-chips.zip and valid-debug-chips.zip under the train_uri. This
     is useful for making sure we are feeding correct data into the model.
 
     Args:
-        databunch: DataBunch for semantic segmentation
+        databunch: DataBunch for instance segmentation
         class_map: (rv.ClassMap) class map used to map class ids to colors
         tmp_dir: (str) path to temp directory
         train_uri: (str) URI of root of training output
@@ -64,7 +64,7 @@ def make_debug_chips(databunch, class_map, tmp_dir, train_uri, max_count=30):
                 break
 
             fig, ax = plt.subplots(1)
-            plot_xy(ax, x, class_map, y=y)
+            plot_xy(ax, x, class_map, y=y['label_arr'])
             plt.savefig(
                 join(debug_chips_dir, '{}.png'.format(i)), figsize=(6, 6))
             plt.close()
@@ -375,7 +375,7 @@ class PyTorchInstanceSegmentation(Backend):
                 with the chip
 
         Return:
-            (SemanticSegmentationLabels) containing predictions
+            (InstanceSegmentationLabels) containing predictions
         """
         self.load_model(tmp_dir)
 
