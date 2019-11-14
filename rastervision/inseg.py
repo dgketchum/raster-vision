@@ -87,7 +87,7 @@ def make_scene(raster_uri, label_uri, task):
     return rv.SceneConfig.builder() \
         .with_task(task) \
         .with_id(_id) \
-        .with_raster_source(raster_uri, channel_order=[0, 1, 2, 3]) \
+        .with_raster_source(raster_uri, channel_order=[0, 1, 2]) \
         .with_label_source(label_source) \
         .build()
 
@@ -108,11 +108,11 @@ if __name__ == '__main__':
     # cmd = '/home/dgketchum/field_extraction/training_data/analyze/washington-inseg-test/command-config-0.json'
     # rv.runner.CommandRunner.run(cmd)
 
-    cmd = '/home/dgketchum/field_extraction/training_data/chip/washington-inseg-test/command-config-0.json'
-    rv.runner.CommandRunner.run(cmd)
-
-    # cmd = '/home/dgketchum/field_extraction/training_data/train/washington-inseg-test/command-config-0.json'
+    # cmd = '/home/dgketchum/field_extraction/training_data/chip/washington-inseg-test/command-config-0.json'
     # rv.runner.CommandRunner.run(cmd)
+
+    cmd = '/home/dgketchum/field_extraction/training_data/train/washington-inseg-test/command-config-0.json'
+    rv.runner.CommandRunner.run(cmd)
 
 # ====================================== EOF =================================================================
 
