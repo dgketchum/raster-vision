@@ -121,7 +121,7 @@ class InstanceSegmentationLabelSourceConfigBuilder(LabelSourceConfigBuilder):
 
         if source is None:
             raise rv.ConfigError(
-                'You must set the source for SemanticSegmentationLabelSourceConfig'
+                'You must set the source for InstanceSegmentationLabelSourceConfig'
                 ' Use "with_raster_source".')
 
         if not isinstance(source, (str, RasterSourceConfig)):

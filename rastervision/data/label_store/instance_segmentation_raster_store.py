@@ -10,7 +10,7 @@ from rastervision.data.label_source import SegmentationClassTransformer
 
 
 class InstanceSegmentationRasterStore(LabelStore):
-    """A prediction label store for segmentation raster files.
+    """A prediction label store for instance segmentation raster files.
     """
 
     def __init__(self,
@@ -60,7 +60,7 @@ class InstanceSegmentationRasterStore(LabelStore):
         """Get all labels.
 
         Returns:
-            SemanticSegmentationLabels with windows of size chip_size covering the
+            InstanceSegmentationLabels with windows of size chip_size covering the
                 scene with no overlap.
         """
 
@@ -69,7 +69,9 @@ class InstanceSegmentationRasterStore(LabelStore):
             if self.class_trans:
                 labels = self.class_trans.rgb_to_class(raw_labels)
             else:
-                labels = np.squeeze(raw_labels)
+                instances = np.unique(raw_labels)
+                labels = raw_labels == instances[:, None, None]
+
             return labels
 
         if self.source is None:
@@ -84,7 +86,7 @@ class InstanceSegmentationRasterStore(LabelStore):
         """Save.
 
         Args:
-            labels - (SemanticSegmentationLabels) labels to be saved
+            labels - (InstanceSegmentationLabels) labels to be saved
         """
         local_path = get_local_path(self.uri, self.tmp_dir)
         make_dir(local_path, use_dirname=True)
@@ -182,5 +184,5 @@ class InstanceSegmentationRasterStore(LabelStore):
                         upload_or_copy(local_geojson_path, uri)
 
     def empty_labels(self):
-        """Returns an empty SemanticSegmentationLabels object."""
+        """Returns an empty InstanceSegmentationLabels object."""
         return InstanceSegmentationLabels()

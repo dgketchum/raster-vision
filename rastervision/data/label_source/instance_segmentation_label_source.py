@@ -71,7 +71,7 @@ class InstanceSegmentationLabelSource(ActivateMixin, LabelSource):
              chip_size: size of sub-windows to use if full extent is used (in
                 units of pixels)
         Returns:
-             SemanticSegmentationLabels
+             InstanceSegmentationLabels
         """
 
         def label_fn(_window):
