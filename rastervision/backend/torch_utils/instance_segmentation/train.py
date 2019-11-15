@@ -12,13 +12,10 @@ def train_epoch(model, device, data_loader, opt, loss_fn, step_scheduler=None):
 
     with click.progressbar(data_loader, label='Training') as bar:
         for batch_ind, (x, target) in enumerate(bar):
-
-            x = x.to(device)
+            x = [_.to(device) for _ in x]
+            target = [{k: v.to(device) for (k, v) in dict_.items()} for dict_ in target]
             opt.zero_grad()
-            out = model([x[0, :, :, :]], [target])
-            # ['out']
-            loss = loss_fn(out, target['masks'])
-            loss.backward()
+            out = model(x, target)
             total_loss += loss.item()
             opt.step()
 

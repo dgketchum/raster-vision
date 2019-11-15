@@ -1,11 +1,12 @@
-from os.path import join, basename
 import glob
+from os.path import join, basename
 
-from PIL import Image
 import numpy as np
+from PIL import Image
+from torch import as_tensor, float32, int64, ones, zeros, cat
 from torch.utils.data import DataLoader, Dataset
-from torch import as_tensor, float32, uint8, ones, zeros, cat
 from torchvision.transforms import Compose, ToTensor
+
 from rastervision.backend.torch_utils.data import DataBunch
 
 
@@ -68,13 +69,16 @@ class InstanceSegmentationDataset(Dataset):
         # to get around exception:
         # RuntimeError: invalid argument 0: Sizes of tensors must match except in dimension 0.
         # this is probably not a real problem
+        # this will need to loop over nb_classes, nb_features
 
-        labels = ones((nb_features,), dtype=uint8)
-        null_labels = zeros((max_features - nb_features,), dtype=uint8)
+        nb_empty = max_features - nb_features
+
+        labels = ones((nb_features,), dtype=int64)
+        null_labels = zeros((nb_empty,), dtype=int64)
         labels = cat([labels, null_labels])
 
-        masks = as_tensor(masks, dtype=uint8)
-        null_masks = zeros((max_features - nb_features, mask.shape[0], mask.shape[1]), dtype=uint8)
+        masks = as_tensor(masks, dtype=int64)
+        null_masks = zeros((nb_empty, mask.shape[0], mask.shape[1]), dtype=int64)
         masks = cat([masks, null_masks])
 
         # consider reinstating id_
@@ -111,7 +115,9 @@ def build_databunch(data_dir, img_sz, batch_sz, class_names):
         batch_size=batch_sz,
         num_workers=num_workers,
         drop_last=True,
-        pin_memory=True)
+        pin_memory=True,
+        collate_fn=collate_fn)
+
     valid_dl = DataLoader(
         valid_ds,
         batch_size=batch_sz,
@@ -119,3 +125,9 @@ def build_databunch(data_dir, img_sz, batch_sz, class_names):
         pin_memory=True)
 
     return DataBunch(train_ds, train_dl, valid_ds, valid_dl, class_names)
+
+
+def collate_fn(data):
+    x = [d[0] for d in data]
+    y = [d[1] for d in data]
+    return x, y
