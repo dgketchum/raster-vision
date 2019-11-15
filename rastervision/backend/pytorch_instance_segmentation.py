@@ -220,8 +220,8 @@ class PyTorchInstanceSegmentation(Backend):
                                     class_names)
         log.info(databunch)
         num_labels = len(databunch.label_names)
-        if self.train_opts.debug:
-            make_debug_chips(databunch, self.class_map, tmp_dir, train_uri)
+        # if self.train_opts.debug:
+        #     make_debug_chips(databunch, self.class_map, tmp_dir, train_uri)
 
         # Setup model
         num_labels = len(databunch.label_names)
@@ -297,7 +297,6 @@ class PyTorchInstanceSegmentation(Backend):
             log.info('-----------------------------------------------------')
             log.info('epoch: {}'.format(epoch))
             start = time.time()
-            # TODO pass correct databunch format for instance_segmentation
             train_loss = train_epoch(model, self.device, databunch.train_dl,
                                      opt, loss_fn, step_scheduler)
             if epoch_scheduler:

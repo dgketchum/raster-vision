@@ -10,22 +10,20 @@ def train_epoch(model, device, data_loader, opt, loss_fn, step_scheduler=None):
     total_loss = 0.0
     num_samples = 0
 
-    with click.progressbar(data_loader, label='Training') as bar:
-        for batch_ind, (x, y) in enumerate(bar):
-            x = x.to(device)
-            y = y.to(device)
-
-            opt.zero_grad()
-            # TODO provide x as torch.utils.data.Dataset.__getitem__: (image, {target})
-            # instance_segmentation delivers x, y as (N, C, H, W), and (N, H, W)
-            out = model(x)['out']
-            loss = loss_fn(out, y)
-            loss.backward()
-            total_loss += loss.item()
-            opt.step()
-            if step_scheduler:
-                step_scheduler.step()
-            num_samples += x.shape[0]
+    # with click.progressbar(data_loader, label='Training') as bar:
+    for batch_ind, (x, target) in enumerate(data_loader):
+        print(x.sum())
+        x = x.to(device)
+        opt.zero_grad()
+        out = model([x], [target])
+        # ['out']
+        loss = loss_fn(out, target['masks'])
+        loss.backward()
+        total_loss += loss.item()
+        opt.step()
+        if step_scheduler:
+            step_scheduler.step()
+        num_samples += x.shape[0]
 
     return total_loss / num_samples
 
