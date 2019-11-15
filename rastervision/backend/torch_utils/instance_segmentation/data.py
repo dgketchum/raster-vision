@@ -77,16 +77,15 @@ class InstanceSegmentationDataset(Dataset):
         null_masks = zeros((max_features - nb_features, mask.shape[0], mask.shape[1]), dtype=uint8)
         masks = cat([masks, null_masks])
 
-        # consider replacing id_
-        # consider replacing area
-        # consider replacing iscrowd
+        # consider reinstating id_
+        # consider reinstating area
+        # consider reinstating iscrowd
 
         if self.transforms is not None:
             x = self.transforms(x)
 
-        # print(tuple(boxes.shape), tuple(labels.shape), tuple(masks.shape))
         target = {'boxes': boxes, 'labels': labels, 'masks': masks}
-        print(x.sum())
+
         return x, target
 
     def __len__(self):

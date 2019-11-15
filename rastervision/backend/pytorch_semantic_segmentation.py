@@ -92,8 +92,9 @@ class PyTorchSemanticSegmentation(Backend):
         self.train_opts = train_opts
         self.inf_learner = None
 
-        torch_cache_dir = '/opt/data/torch-cache'
-        os.environ['TORCH_HOME'] = torch_cache_dir
+        # TODO un-comment this code
+        # torch_cache_dir = '/opt/data/torch-cache'
+        # os.environ['TORCH_HOME'] = torch_cache_dir
 
         self.model = None
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'

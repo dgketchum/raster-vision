@@ -2,21 +2,31 @@ import os
 
 import rastervision as rv
 
-aoi_path = 'AOIs/AOI_1_Rio/srcData/buildingLabels/Rio_OUTLINE_Public_AOI.geojson'
-
-RAW_URI = '/opt/data/training_data'
-PROCESSED_URI = os.path.join(RAW_URI, 'example')
-ROOT_URI = '/opt/data/training_data'
+if 'home' in os.getcwd():
+    home = os.path.expanduser('~')
+    ROOT_URI = os.path.join(home, 'field_extraction', 'training_data')
+    PROCESSED_URI = os.path.join(ROOT_URI, 'example')
+    TMP = os.environ['TMPDIR'] = os.path.join(ROOT_URI, 'tmp')
+    os.environ['TORCH_HOME'] = os.path.join(home, 'field_extraction', 'torche-cache')
+    os.environ['GDAL_DATA'] = os.path.join(home,
+                                           'miniconda2/envs/vision/lib/python3.7/site-packages/rasterio/gdal_data')
+else:
+    ROOT_URI = '/opt/data/training_data'
+    PROCESSED_URI = os.path.join(ROOT_URI, 'example')
 
 
 class SemanticSegmentationExperiments(rv.ExperimentSet):
-    def exp_main(self):
+    def exp_main(self, test=True):
 
         train_scene_info = get_scene_info('train')
         val_scene_info = get_scene_info('val')
 
-        exp_id = 'idaho-espa-semseg'
+        exp_id = 'washington-semseg-test'
         classes = {'field': (1, 'green'), 'background': (0, 'white')}
+
+        if test:
+            train_scene_info = train_scene_info[0:1]
+            val_scene_info = val_scene_info[0:1]
 
         task = rv.TaskConfig.builder(rv.SEMANTIC_SEGMENTATION) \
             .with_chip_size(300) \
@@ -83,4 +93,8 @@ def get_scene_info(_type='train'):
 
 
 if __name__ == '__main__':
-    rv.main()
+    # i = SemanticSegmentationExperiments().exp_main()
+    # rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
+    # rv.main()
+    cmd = '/home/dgketchum/field_extraction/training_data/train/washington-semseg-test/command-config-0.json'
+    rv.runner.CommandRunner.run(cmd)
