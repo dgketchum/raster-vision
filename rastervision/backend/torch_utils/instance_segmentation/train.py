@@ -7,24 +7,30 @@ from rastervision.backend.torch_utils.metrics import (compute_conf_mat,
 
 def train_epoch(model, device, data_loader, opt, loss_fn, step_scheduler=None):
     model.train()
-    total_loss = 0.0
+    total_loss = 0
     num_samples = 0
 
     with click.progressbar(data_loader, label='Training') as bar:
         for batch_ind, (x, target) in enumerate(bar):
             x = [_.to(device) for _ in x]
             target = [{k: v.to(device) for (k, v) in dict_.items()} for dict_ in target]
-            opt.zero_grad()
             out = model(x, target)
-            total_loss += loss.item()
+            opt.zero_grad()
+
+            loss = out['loss_classifier'] + out['loss_box_reg'] + out['loss_mask'] + \
+                   out['loss_objectness'] + 0.1 * out['loss_rpn_box_reg']
+
+            total_loss += torch.tensor([v for (k, v) in out.items()]).sum()
+
+            loss.backward()
             opt.step()
 
         if step_scheduler:
             step_scheduler.step()
 
-        num_samples += x.shape[0]
+        num_samples += len(x)
 
-    return total_loss / num_samples
+    return out
 
 
 def validate_epoch(model, device, data_loader, num_labels):
