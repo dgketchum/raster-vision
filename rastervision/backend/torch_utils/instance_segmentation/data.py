@@ -5,27 +5,10 @@ import numpy as np
 from PIL import Image
 from torch import as_tensor, float32, int64, ones, zeros, cat
 from torch.utils.data import DataLoader, Dataset
-from torchvision.transforms import Compose, ToTensor
+from torchvision.transforms import Compose, ToTensor, Normalize
+from torchvision.transforms import Resize, CenterCrop, RandomResizedCrop, RandomHorizontalFlip
 
 from rastervision.backend.torch_utils.data import DataBunch
-
-
-# class ToTensor(object):
-#     def __init__(self):
-#         self.to_tensor = torchvision.transforms.ToTensor()
-#
-#     def __call__(self, x, y):
-#         return (self.to_tensor(x), (255 * self.to_tensor(y)).squeeze().long())
-
-
-class ComposeTransforms(object):
-    def __init__(self, transforms):
-        self.transforms = transforms
-
-    def __call__(self, x, y):
-        for t in self.transforms:
-            x, y = t(x, y)
-        return x, y
 
 
 class InstanceSegmentationDataset(Dataset):
@@ -40,7 +23,6 @@ class InstanceSegmentationDataset(Dataset):
         label_path = join(self.data_dir, 'labels', basename(img_path))
 
         img = Image.open(img_path).convert('RGB')
-        x = np.array(img)
 
         y = Image.open(label_path)
         mask = np.array(y)
@@ -66,10 +48,8 @@ class InstanceSegmentationDataset(Dataset):
 
         # the following is a hack to generate labels and masks of consistent shape,
         # regardless of the number of features in the training data
-        # to get around exception:
-        # RuntimeError: invalid argument 0: Sizes of tensors must match except in dimension 0.
         # this is probably not a real problem
-        # this will need to loop over nb_classes, nb_features
+        # TODO need to loop over nb_classes, nb_features
 
         nb_empty = max_features - nb_features
 
@@ -86,7 +66,7 @@ class InstanceSegmentationDataset(Dataset):
         # consider reinstating iscrowd
 
         if self.transforms is not None:
-            x = self.transforms(x)
+            x = self.transforms(img)
 
         target = {'boxes': boxes, 'labels': labels, 'masks': masks}
 
@@ -103,11 +83,23 @@ def build_databunch(data_dir, img_sz, batch_sz, class_names):
     train_dir = join(data_dir, 'train')
     valid_dir = join(data_dir, 'valid')
 
-    aug_transforms = Compose([ToTensor()])
-    transforms = Compose([ToTensor()])
+    data_transforms = {
+        'train': Compose([
+            RandomResizedCrop(img_sz),
+            RandomHorizontalFlip(),
+            ToTensor(),
+            Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ]),
+        'val': Compose([
+            Resize(img_sz),
+            CenterCrop(img_sz),
+            ToTensor(),
+            Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ]),
+    }
 
-    train_ds = InstanceSegmentationDataset(train_dir, transforms=aug_transforms)
-    valid_ds = InstanceSegmentationDataset(valid_dir, transforms=transforms)
+    train_ds = InstanceSegmentationDataset(train_dir, transforms=data_transforms['train'])
+    valid_ds = InstanceSegmentationDataset(valid_dir, transforms=data_transforms['val'])
 
     train_dl = DataLoader(
         train_ds,
