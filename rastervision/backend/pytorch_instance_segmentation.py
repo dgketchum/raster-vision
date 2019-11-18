@@ -241,7 +241,7 @@ class PyTorchInstanceSegmentation(Backend):
         if pretrained_uri:
             log.info('Loading weights from pretrained_uri: {}'.format(
                 pretrained_uri))
-            pretrained_path = download_if_needed(pretrained_uri, tmp_dir)
+            pretrained_path = download_if_needed(pretrained_uri[0], tmp_dir)
             model.load_state_dict(
                 torch.load(pretrained_path, map_location=self.device))
 

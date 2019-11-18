@@ -18,7 +18,7 @@ def train_epoch(model, device, data_loader, opt, loss_fn, step_scheduler=None):
             opt.zero_grad()
 
             loss = out['loss_classifier'] + out['loss_box_reg'] + out['loss_mask'] + \
-                   out['loss_objectness'] + 0.0625 * out['loss_rpn_box_reg']
+                   out['loss_objectness'] + out['loss_rpn_box_reg']
 
             loss.backward()
 
@@ -44,8 +44,7 @@ def validate_epoch(model, device, data_loader, num_labels):
     with torch.no_grad():
         with click.progressbar(data_loader, label='Validating') as bar:
             for batch_ind, (x, target) in enumerate(bar):
-                x = [_.to(device) for _ in x]
-                out = model(x)
+                pass
 
     # Ignore index zero.
     conf_mat = conf_mat[1:, 1:]

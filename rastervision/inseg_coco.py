@@ -4,7 +4,7 @@ import os
 import rasterio
 from rasterio.dtypes import int16
 from numpy import zeros
-from pycocotools.coco import COCO
+# from pycocotools.coco import COCO
 
 import rastervision as rv
 
@@ -32,7 +32,7 @@ COCO_INSTANCE_CATEGORY_NAMES = [
     'donut', 'cake', 'chair', 'couch', 'potted plant', 'bed', 'N/A', 'dining table',
     'N/A', 'N/A', 'toilet', 'N/A', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone',
     'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'N/A', 'book',
-    'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush'
+    'clock', 'vase', 'scissors', 'teddy bear', 'hair drier'
 ]
 
 MODEL_URI = 'https://download.pytorch.org/models/maskrcnn_resnet50_fpn_coco-bf2d0c1e.pth',
@@ -49,7 +49,7 @@ class InstanceSegmentationExperiments(rv.ExperimentSet):
 
         debug = True
         num_epochs = 100
-        batch_size = 8
+        batch_size = 5
 
         task = rv.TaskConfig.builder(rv.INSTANCE_SEGMENTATION) \
             .with_chip_size(300) \
@@ -176,10 +176,10 @@ if __name__ == '__main__':
     # rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
     # rv.main()
 
-    cmd = '/home/dgketchum/field_extraction/training_data/chip/coco-inseg/command-config-0.json'
-    rv.runner.CommandRunner.run(cmd)
-
-    # cmd = '/home/dgketchum/field_extraction/training_data/train/coco-inseg/command-config-0.json'
+    # cmd = '/home/dgketchum/field_extraction/training_data/chip/coco-inseg/command-config-0.json'
     # rv.runner.CommandRunner.run(cmd)
+
+    cmd = '/home/dgketchum/field_extraction/training_data/train/coco-inseg/command-config-0.json'
+    rv.runner.CommandRunner.run(cmd)
 
 # ====================================== EOF =================================================================

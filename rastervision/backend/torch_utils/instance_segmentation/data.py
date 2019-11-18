@@ -91,8 +91,6 @@ def build_databunch(data_dir, img_sz, batch_sz, class_names):
             Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ]),
         'val': Compose([
-            Resize(img_sz),
-            CenterCrop(img_sz),
             ToTensor(),
             Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ]),

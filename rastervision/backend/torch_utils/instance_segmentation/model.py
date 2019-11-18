@@ -9,6 +9,7 @@ model_urls = {
 
 
 def get_model(model_arch, num_labels, pretrained=False, progress=True):
+
     if pretrained:
         pretrained_backbone = False
     else:
