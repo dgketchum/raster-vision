@@ -1,14 +1,12 @@
 import json
 import os
 
-import matplotlib.pyplot as plt
-from PIL import Image
-from descartes import PolygonPatch
-from matplotlib import collections as cplt
-from shapely.geometry import Polygon
-import rastervision as rv
-from pycocotools import mask
+import rasterio
+from rasterio.dtypes import uint8, int16
+from numpy import zeros, flip
 from pycocotools.coco import COCO
+
+import rastervision as rv
 
 if 'home' in os.getcwd():
     home = os.path.expanduser('~')
@@ -118,36 +116,35 @@ def get_scene_info(_type='train'):
 
     labels_train = os.path.join(PROCESSED_URI, 'label_{}'.format(_type))
 
+    coco = COCO('/home/dgketchum/Downloads/annotations/instances_val2017.json')
+
+    images = []
+    
     for k, v in meta.items():
+        if k in ['493019']:
+            id_ = v['id']
+            h, w = v['height'], v['width']
 
-        ann = v['annotations']
-        seg = ann['segmentation']
-        h, w = v['height'], v['width']
-        b = ann['bbox']
+            img_ann = [a for a in coco.anns.values() if a['image_id'] == id_]
+            label_map = zeros((len(img_ann), h, w), dtype=int16)
 
-        x = [[x for x in s[1::2]] for s in seg]
-        y = [[y for y in s[::2]] for s in seg]
-        vectors = [Polygon(zip(x, y)) for x, y in zip(x, y)]
+            for i, a in enumerate(img_ann, start=0):
+                label_mask = coco.annToMask(img_ann[i]) == 1
+                new_label = img_ann[i]['category_id']
+                label_map[i, label_mask] = new_label
 
-        # x, y, bh, bw = b[0], h - b[1], b[2], b[3]
-        # b = Box(y - bh, x, y, x + bw)
-        # vectors.append(b.to_shapely())
+            fig_name = os.path.join(labels_train, '{}'.format(v['file_name'].replace('.jpg', '.tif')))
+            meta = {'driver': 'GTiff',
+                    'height': h,
+                    'width': w,
+                    'count': len(img_ann),
+                    'dtype': int16}
+            with rasterio.open(fig_name, 'w', **meta) as out:
+                out.write(label_map)
 
-        im = Image.open(v['uri'], 'r')
-        im = im.transpose(Image.FLIP_TOP_BOTTOM)
-        fig, ax = plt.subplots()
-        plt.imshow(im, cmap='viridis')
-        patches = [PolygonPatch(feature, edgecolor="red", facecolor="none",
-                                linewidth=1.) for feature in vectors]
-        ax.add_collection(cplt.PatchCollection(patches, match_original=True))
-        ax.set_xlim(0, im.size[0])
-        ax.set_ylim(0, im.size[1])
-        fig_name = os.path.join(labels_train, '{}'.format(v['file_name']))
-        plt.savefig(fig_name)
-        plt.close(fig)
+        images.append((v['uri'], fig_name))
 
-    labels_uris_train = [os.path.join(labels_train, x) for x in os.listdir(img_dir_train) if x.endswith('.jpg')]
-    return [(x, y) for x, y in zip(img_uris_train, labels_uris_train)]
+    return images
 
 
 def collate_annotations(img_dir_train):
@@ -175,8 +172,7 @@ def collate_annotations(img_dir_train):
 
 if __name__ == '__main__':
     # i = InstanceSegmentationExperiments().exp_main()
-    # rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
-    # rv.main()
-    # collate_annotations(os.path.join(PROCESSED_URI, 'image_val'))
-    get_scene_info(_type='val')
+    rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
+    rv.main()
+
 # ====================================== EOF =================================================================
