@@ -1,16 +1,14 @@
-import os
 import json
+import os
 
-import rastervision as rv
-
-import rasterio
-import rasterio.plot
-from numpy import flip
 import matplotlib.pyplot as plt
-from matplotlib import collections as cplt
-from shapely.geometry import Polygon, shape
+from PIL import Image
 from descartes import PolygonPatch
-
+from matplotlib import collections as cplt
+from shapely.geometry import Polygon
+import rastervision as rv
+from pycocotools import mask
+from pycocotools.coco import COCO
 
 if 'home' in os.getcwd():
     home = os.path.expanduser('~')
@@ -117,63 +115,68 @@ def get_scene_info(_type='train'):
 
     img_dir_train = os.path.join(PROCESSED_URI, 'image_{}'.format(_type))
     img_uris_train = [os.path.join(img_dir_train, x) for x in os.listdir(img_dir_train) if x.endswith('.jpg')]
-    file_names = [x for x in os.listdir(img_dir_train) if x.endswith('.jpg')]
 
-    labels_train = img_dir_train.replace('image_{}'.format(_type), 'label_{}'.format(_type))
-
-    # meta = {}
-    # for x in j['images']:
-    #     try:
-    #         pos = file_names.index(x['file_name'])
-    #         x['uri'] = os.path.join(img_dir_train, x['file_name'])
-    #         x['idx'] = pos
-    #         for a in j['annotations']:
-    #             if a['id'] == x['id']:
-    #                 x['annotations'] = a
-    #                 meta[a['id']] = x
-    #                 break
-    #     except ValueError:
-    #         pass
-    #
-    # with open('/home/dgketchum/Downloads/annotations/instances_val2017_collated.json', 'w') as fp:
-    #     json.dump(meta, fp)
+    labels_train = os.path.join(PROCESSED_URI, 'label_{}'.format(_type))
 
     for k, v in meta.items():
+
         ann = v['annotations']
         seg = ann['segmentation']
-        x = [[x for x in s[::2]] for s in seg]
-        y = [[y for y in s[1::2]] for s in seg]
+        h, w = v['height'], v['width']
+        b = ann['bbox']
+
+        x = [[x for x in s[1::2]] for s in seg]
+        y = [[y for y in s[::2]] for s in seg]
         vectors = [Polygon(zip(x, y)) for x, y in zip(x, y)]
-        with rasterio.open(v['uri'], 'r') as src:
-            arr = src.read()
-            arr = flip(arr, axis=1)
-            fig, ax = plt.subplots()
-            rasterio.plot.show(arr, cmap='viridis', ax=ax, transform=src.transform)
-            patches = [PolygonPatch(feature, edgecolor="red", facecolor="none",
-                                    linewidth=1.) for feature in vectors]
-            ax.add_collection(cplt.PatchCollection(patches, match_original=True))
-            ax.set_xlim(0, src.width)
-            ax.set_ylim(0, src.height)
-            fig_name = os.path.join(labels_train, '{}.jpg'.format(v['uri']))
-            plt.savefig(fig_name)
-            plt.close(fig)
+
+        # x, y, bh, bw = b[0], h - b[1], b[2], b[3]
+        # b = Box(y - bh, x, y, x + bw)
+        # vectors.append(b.to_shapely())
+
+        im = Image.open(v['uri'], 'r')
+        im = im.transpose(Image.FLIP_TOP_BOTTOM)
+        fig, ax = plt.subplots()
+        plt.imshow(im, cmap='viridis')
+        patches = [PolygonPatch(feature, edgecolor="red", facecolor="none",
+                                linewidth=1.) for feature in vectors]
+        ax.add_collection(cplt.PatchCollection(patches, match_original=True))
+        ax.set_xlim(0, im.size[0])
+        ax.set_ylim(0, im.size[1])
+        fig_name = os.path.join(labels_train, '{}'.format(v['file_name']))
+        plt.savefig(fig_name)
+        plt.close(fig)
 
     labels_uris_train = [os.path.join(labels_train, x) for x in os.listdir(img_dir_train) if x.endswith('.jpg')]
     return [(x, y) for x, y in zip(img_uris_train, labels_uris_train)]
 
 
+def collate_annotations(img_dir_train):
+
+    f = open('/home/dgketchum/Downloads/annotations/instances_val2017.json', 'r')
+    j = json.load(f)
+    f.close()
+
+    meta = {}
+    for x in j['images']:
+        try:
+            x['uri'] = os.path.join(img_dir_train, x['file_name'])
+            if os.path.exists(x['uri']):
+                for a in j['annotations']:
+                    if a['id'] == x['id']:
+                        x['annotations'] = a
+                        meta[a['id']] = x
+                        break
+        except ValueError:
+            pass
+
+    with open('/home/dgketchum/Downloads/annotations/instances_val2017_collated.json', 'w') as fp:
+        json.dump(meta, fp)
+
+
 if __name__ == '__main__':
-    i = InstanceSegmentationExperiments().exp_main()
-    rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
-    rv.main()
-
-    # cmd = '/home/dgketchum/field_extraction/training_data/analyze/washington-inseg/command-config-0.json'
-    # rv.runner.CommandRunner.run(cmd)
-    #
-    # cmd = '/home/dgketchum/field_extraction/training_data/chip/washington-inseg/command-config-0.json'
-    # rv.runner.CommandRunner.run(cmd)
-    #
-    # cmd = '/home/dgketchum/field_extraction/training_data/train/washington-inseg/command-config-0.json'
-    # rv.runner.CommandRunner.run(cmd)
-
+    # i = InstanceSegmentationExperiments().exp_main()
+    # rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
+    # rv.main()
+    # collate_annotations(os.path.join(PROCESSED_URI, 'image_val'))
+    get_scene_info(_type='val')
 # ====================================== EOF =================================================================
