@@ -1,18 +1,28 @@
 import os
+import json
 
 import rastervision as rv
+
+import rasterio
+import rasterio.plot
+from numpy import flip
+import matplotlib.pyplot as plt
+from matplotlib import collections as cplt
+from shapely.geometry import Polygon, shape
+from descartes import PolygonPatch
+
 
 if 'home' in os.getcwd():
     home = os.path.expanduser('~')
     ROOT_URI = os.path.join(home, 'field_extraction', 'training_data')
-    PROCESSED_URI = os.path.join(ROOT_URI, 'example')
+    PROCESSED_URI = os.path.join(ROOT_URI, 'example', 'COCO')
     TMP = os.environ['TMPDIR'] = os.path.join(ROOT_URI, 'tmp')
     os.environ['TORCH_HOME'] = os.path.join(home, 'field_extraction', 'torch-cache')
     os.environ['GDAL_DATA'] = os.path.join(home,
                                            'miniconda2/envs/vision/lib/python3.7/site-packages/rasterio/gdal_data')
 else:
     ROOT_URI = '/opt/data/training_data'
-    PROCESSED_URI = os.path.join(ROOT_URI, 'example')
+    PROCESSED_URI = os.path.join(ROOT_URI, 'example', 'COCO')
 
 COCO_INSTANCE_CATEGORY_NAMES = [
     '__background__', 'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
@@ -29,10 +39,12 @@ COCO_INSTANCE_CATEGORY_NAMES = [
     'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush'
 ]
 
+MODEL_URI = 'https://download.pytorch.org/models/maskrcnn_resnet50_fpn_coco-bf2d0c1e.pth',
+
 
 class InstanceSegmentationExperiments(rv.ExperimentSet):
     def exp_main(self):
-        train_scene_info = get_scene_info('train')
+        # train_scene_info = get_scene_info('train')
         val_scene_info = get_scene_info('val')
 
         exp_id = 'coco-inseg'
@@ -50,6 +62,7 @@ class InstanceSegmentationExperiments(rv.ExperimentSet):
 
         backend = rv.BackendConfig.builder(rv.PYTORCH_INSTANCE_SEGMENTATION) \
             .with_task(task) \
+            .with_pretrained_uri(MODEL_URI)\
             .with_train_options(
             batch_size=batch_size,
             lr=1e-4,
@@ -58,11 +71,10 @@ class InstanceSegmentationExperiments(rv.ExperimentSet):
             debug=debug) \
             .build()
 
-        train_scenes = [make_scene(x, y, task) for x, y in train_scene_info]
-        val_scenes = [make_scene(x, y, task) for x, y in val_scene_info]
+        # train_scenes = [make_scene(x, y, task) for x, y in train_scene_info]
+        val_scenes = [make_scene(x, y, task) for x, y in val_scene_info[:100]]
 
         dataset = rv.DatasetConfig.builder() \
-            .with_train_scenes(train_scenes) \
             .with_validation_scenes(val_scenes) \
             .build()
 
@@ -98,10 +110,55 @@ def make_scene(raster_uri, label_uri, task):
 
 
 def get_scene_info(_type='train'):
+
+    f = open('/home/dgketchum/Downloads/annotations/instances_val2017_collated.json', 'r')
+    meta = json.load(f)
+    f.close()
+
     img_dir_train = os.path.join(PROCESSED_URI, 'image_{}'.format(_type))
-    img_uris_train = [os.path.join(img_dir_train, x) for x in os.listdir(img_dir_train) if x.endswith('.tif')]
+    img_uris_train = [os.path.join(img_dir_train, x) for x in os.listdir(img_dir_train) if x.endswith('.jpg')]
+    file_names = [x for x in os.listdir(img_dir_train) if x.endswith('.jpg')]
+
     labels_train = img_dir_train.replace('image_{}'.format(_type), 'label_{}'.format(_type))
-    labels_uris_train = [os.path.join(labels_train, x) for x in os.listdir(img_dir_train) if x.endswith('.tif')]
+
+    # meta = {}
+    # for x in j['images']:
+    #     try:
+    #         pos = file_names.index(x['file_name'])
+    #         x['uri'] = os.path.join(img_dir_train, x['file_name'])
+    #         x['idx'] = pos
+    #         for a in j['annotations']:
+    #             if a['id'] == x['id']:
+    #                 x['annotations'] = a
+    #                 meta[a['id']] = x
+    #                 break
+    #     except ValueError:
+    #         pass
+    #
+    # with open('/home/dgketchum/Downloads/annotations/instances_val2017_collated.json', 'w') as fp:
+    #     json.dump(meta, fp)
+
+    for k, v in meta.items():
+        ann = v['annotations']
+        seg = ann['segmentation']
+        x = [[x for x in s[::2]] for s in seg]
+        y = [[y for y in s[1::2]] for s in seg]
+        vectors = [Polygon(zip(x, y)) for x, y in zip(x, y)]
+        with rasterio.open(v['uri'], 'r') as src:
+            arr = src.read()
+            arr = flip(arr, axis=1)
+            fig, ax = plt.subplots()
+            rasterio.plot.show(arr, cmap='viridis', ax=ax, transform=src.transform)
+            patches = [PolygonPatch(feature, edgecolor="red", facecolor="none",
+                                    linewidth=1.) for feature in vectors]
+            ax.add_collection(cplt.PatchCollection(patches, match_original=True))
+            ax.set_xlim(0, src.width)
+            ax.set_ylim(0, src.height)
+            fig_name = os.path.join(labels_train, '{}.jpg'.format(v['uri']))
+            plt.savefig(fig_name)
+            plt.close(fig)
+
+    labels_uris_train = [os.path.join(labels_train, x) for x in os.listdir(img_dir_train) if x.endswith('.jpg')]
     return [(x, y) for x, y in zip(img_uris_train, labels_uris_train)]
 
 
