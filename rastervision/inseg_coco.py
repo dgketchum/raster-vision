@@ -2,8 +2,8 @@ import json
 import os
 
 import rasterio
-from rasterio.dtypes import uint8, int16
-from numpy import zeros, flip
+from rasterio.dtypes import int16
+from numpy import zeros
 from pycocotools.coco import COCO
 
 import rastervision as rv
@@ -40,7 +40,8 @@ MODEL_URI = 'https://download.pytorch.org/models/maskrcnn_resnet50_fpn_coco-bf2d
 
 class InstanceSegmentationExperiments(rv.ExperimentSet):
     def exp_main(self):
-        # train_scene_info = get_scene_info('train')
+
+        train_scene_info = get_scene_info('train')
         val_scene_info = get_scene_info('val')
 
         exp_id = 'coco-inseg'
@@ -67,10 +68,11 @@ class InstanceSegmentationExperiments(rv.ExperimentSet):
             debug=debug) \
             .build()
 
-        # train_scenes = [make_scene(x, y, task) for x, y in train_scene_info]
-        val_scenes = [make_scene(x, y, task) for x, y in val_scene_info[:100]]
+        train_scenes = [make_scene(x, y, task) for x, y in train_scene_info]
+        val_scenes = [make_scene(x, y, task) for x, y in val_scene_info]
 
         dataset = rv.DatasetConfig.builder() \
+            .with_train_scenes(train_scenes) \
             .with_validation_scenes(val_scenes) \
             .build()
 
@@ -119,28 +121,27 @@ def get_scene_info(_type='train'):
     coco = COCO('/home/dgketchum/Downloads/annotations/instances_val2017.json')
 
     images = []
-    
+
     for k, v in meta.items():
-        if k in ['493019']:
-            id_ = v['id']
-            h, w = v['height'], v['width']
+        id_ = v['id']
+        h, w = v['height'], v['width']
 
-            img_ann = [a for a in coco.anns.values() if a['image_id'] == id_]
-            label_map = zeros((len(img_ann), h, w), dtype=int16)
+        img_ann = [a for a in coco.anns.values() if a['image_id'] == id_]
+        label_map = zeros((len(img_ann), h, w), dtype=int16)
 
-            for i, a in enumerate(img_ann, start=0):
-                label_mask = coco.annToMask(img_ann[i]) == 1
-                new_label = img_ann[i]['category_id']
-                label_map[i, label_mask] = new_label
+        for i, a in enumerate(img_ann, start=0):
+            label_mask = coco.annToMask(img_ann[i]) == 1
+            new_label = img_ann[i]['category_id']
+            label_map[i, label_mask] = new_label
 
-            fig_name = os.path.join(labels_train, '{}'.format(v['file_name'].replace('.jpg', '.tif')))
-            meta = {'driver': 'GTiff',
-                    'height': h,
-                    'width': w,
-                    'count': len(img_ann),
-                    'dtype': int16}
-            with rasterio.open(fig_name, 'w', **meta) as out:
-                out.write(label_map)
+        fig_name = os.path.join(labels_train, '{}'.format(v['file_name'].replace('.jpg', '.tif')))
+        meta = {'driver': 'GTiff',
+                'height': h,
+                'width': w,
+                'count': len(img_ann),
+                'dtype': int16}
+        with rasterio.open(fig_name, 'w', **meta) as out:
+            out.write(label_map)
 
         images.append((v['uri'], fig_name))
 
@@ -172,7 +173,13 @@ def collate_annotations(img_dir_train):
 
 if __name__ == '__main__':
     # i = InstanceSegmentationExperiments().exp_main()
-    rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
-    rv.main()
+    # rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
+    # rv.main()
+
+    cmd = '/home/dgketchum/field_extraction/training_data/chip/coco-inseg/command-config-0.json'
+    rv.runner.CommandRunner.run(cmd)
+
+    # cmd = '/home/dgketchum/field_extraction/training_data/train/coco-inseg/command-config-0.json'
+    # rv.runner.CommandRunner.run(cmd)
 
 # ====================================== EOF =================================================================
