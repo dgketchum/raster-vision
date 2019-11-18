@@ -16,7 +16,7 @@ else:
 
 
 class InstanceSegmentationExperiments(rv.ExperimentSet):
-    def exp_main(self, test=True):
+    def exp_main(self):
 
         train_scene_info = get_scene_info('train')
         val_scene_info = get_scene_info('val')
@@ -24,17 +24,9 @@ class InstanceSegmentationExperiments(rv.ExperimentSet):
         exp_id = 'washington-inseg'
         classes = {'field': (1, 'green'), 'background': (0, 'white')}
 
-        if test:
-            exp_id += '-test'
-            debug = True
-            num_epochs = 1
-            batch_size = 2
-            train_scene_info = train_scene_info[0:1]
-            val_scene_info = val_scene_info[0:1]
-        else:
-            debug = True
-            num_epochs = 100
-            batch_size = 8
+        debug = True
+        num_epochs = 100
+        batch_size = 8
 
         task = rv.TaskConfig.builder(rv.INSTANCE_SEGMENTATION) \
             .with_chip_size(300) \
@@ -101,17 +93,17 @@ def get_scene_info(_type='train'):
 
 
 if __name__ == '__main__':
-    # i = InstanceSegmentationExperiments().exp_main(test=True)
+    # i = InstanceSegmentationExperiments().exp_main(test=False)
     # rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
     # rv.main()
 
-    # cmd = '/home/dgketchum/field_extraction/training_data/analyze/washington-inseg-test/command-config-0.json'
+    # cmd = '/home/dgketchum/field_extraction/training_data/analyze/washington-inseg/command-config-0.json'
     # rv.runner.CommandRunner.run(cmd)
-
-    # cmd = '/home/dgketchum/field_extraction/training_data/chip/washington-inseg-test/command-config-0.json'
+    #
+    # cmd = '/home/dgketchum/field_extraction/training_data/chip/washington-inseg/command-config-0.json'
     # rv.runner.CommandRunner.run(cmd)
-
-    cmd = '/home/dgketchum/field_extraction/training_data/train/washington-inseg-test/command-config-0.json'
+    #
+    cmd = '/home/dgketchum/field_extraction/training_data/train/washington-inseg/command-config-0.json'
     rv.runner.CommandRunner.run(cmd)
 
 # ====================================== EOF =================================================================
