@@ -1,16 +1,16 @@
-from os.path import (join, isfile, basename, dirname)
+import csv
+import datetime
+import glob
+import json
+import logging
+import time
 import uuid
 import zipfile
-import glob
-import logging
-import json
+from os.path import (join, isfile, basename, dirname)
 from subprocess import Popen
-import os
-import csv
-import time
-import datetime
 
 import matplotlib
+
 matplotlib.use('Agg')  # noqa
 import matplotlib.pyplot as plt
 import torch
@@ -135,6 +135,12 @@ class PyTorchInstanceSegmentation(Backend):
             label_path = join(labels_dir, '{}-{}.png'.format(scene.id, ind))
 
             label_im = labels.get_label_arr(window).astype(np.uint8)
+
+            try:
+                label_im = label_im.sum(axis=2)
+            except np.AxisError:
+                pass
+
             save_img(label_im, label_path)
             save_img(chip, chip_path)
 
@@ -226,7 +232,7 @@ class PyTorchInstanceSegmentation(Backend):
         # Setup model
         num_labels = len(databunch.label_names)
         model = get_model(
-            self.train_opts.model_arch, num_labels, pretrained=False)
+            self.train_opts.model_arch, num_labels, pretrained=True)
         model = model.to(self.device)
         model_path = join(train_dir, 'model')
 
@@ -299,9 +305,10 @@ class PyTorchInstanceSegmentation(Backend):
             start = time.time()
             train_loss = train_epoch(model, self.device, databunch.train_dl,
                                      opt, loss_fn, step_scheduler)
+
             if epoch_scheduler:
                 epoch_scheduler.step()
-            log.info('train loss: {}'.format(train_loss))
+            log.info('train loss: {}'.format(train_loss['total_loss']))
 
             # Validate one epoch.
             metrics = validate_epoch(model, self.device, databunch.valid_dl,
@@ -329,7 +336,7 @@ class PyTorchInstanceSegmentation(Backend):
             if self.train_opts.log_tensorboard:
                 for key, val in metrics.items():
                     tb_writer.add_scalar(key, val, epoch)
-                tb_writer.add_scalar('train_loss', train_loss, epoch)
+                tb_writer.add_scalar('train_loss', train_loss['total_loss'], epoch)
                 for name, param in model.named_parameters():
                     tb_writer.add_histogram(name, param, epoch)
 
