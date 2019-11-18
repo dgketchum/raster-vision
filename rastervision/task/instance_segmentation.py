@@ -123,7 +123,12 @@ class InstanceSegmentation(Task):
                     # If chip has ignore labels, fill in those pixels with
                     # nodata.
                     label_arr = labels.get_label_arr(window)
-                    zero_inds = label_arr.ravel() == 0
+
+                    try:
+                        zero_inds = label_arr.sum(axis=2).ravel() == 0
+                    except np.AxisError:
+                        zero_inds = label_arr.ravel() == 0
+
                     chip_shape = chip.shape
                     if np.any(zero_inds):
                         chip = np.reshape(chip, (-1, chip.shape[2]))
