@@ -7,7 +7,6 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
-from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -21,10 +20,10 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='rastervision/protos/dataset.proto',
   package='rv.protos',
   syntax='proto2',
+  serialized_options=None,
   serialized_pb=_b('\n!rastervision/protos/dataset.proto\x12\trv.protos\x1a\x1frastervision/protos/scene.proto\x1a#rastervision/protos/augmentor.proto\"\xcd\x01\n\rDatasetConfig\x12,\n\x0ctrain_scenes\x18\x03 \x03(\x0b\x32\x16.rv.protos.SceneConfig\x12\x31\n\x11validation_scenes\x18\x04 \x03(\x0b\x32\x16.rv.protos.SceneConfig\x12+\n\x0btest_scenes\x18\x05 \x03(\x0b\x32\x16.rv.protos.SceneConfig\x12.\n\naugmentors\x18\x06 \x03(\x0b\x32\x1a.rv.protos.AugmentorConfig')
   ,
   dependencies=[rastervision_dot_protos_dot_scene__pb2.DESCRIPTOR,rastervision_dot_protos_dot_augmentor__pb2.DESCRIPTOR,])
-_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 
 
@@ -42,35 +41,35 @@ _DATASETCONFIG = _descriptor.Descriptor(
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='validation_scenes', full_name='rv.protos.DatasetConfig.validation_scenes', index=1,
       number=4, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='test_scenes', full_name='rv.protos.DatasetConfig.test_scenes', index=2,
       number=5, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='augmentors', full_name='rv.protos.DatasetConfig.augmentors', index=3,
       number=6, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
@@ -85,6 +84,7 @@ _DATASETCONFIG.fields_by_name['validation_scenes'].message_type = rastervision_d
 _DATASETCONFIG.fields_by_name['test_scenes'].message_type = rastervision_dot_protos_dot_scene__pb2._SCENECONFIG
 _DATASETCONFIG.fields_by_name['augmentors'].message_type = rastervision_dot_protos_dot_augmentor__pb2._AUGMENTORCONFIG
 DESCRIPTOR.message_types_by_name['DatasetConfig'] = _DATASETCONFIG
+_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 DatasetConfig = _reflection.GeneratedProtocolMessageType('DatasetConfig', (_message.Message,), dict(
   DESCRIPTOR = _DATASETCONFIG,

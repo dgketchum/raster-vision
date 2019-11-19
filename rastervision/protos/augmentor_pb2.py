@@ -7,7 +7,6 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
-from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -20,10 +19,10 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='rastervision/protos/augmentor.proto',
   package='rv.protos',
   syntax='proto2',
+  serialized_options=None,
   serialized_pb=_b('\n#rastervision/protos/augmentor.proto\x12\trv.protos\x1a\x1cgoogle/protobuf/struct.proto\"\x83\x01\n\x0f\x41ugmentorConfig\x12\x16\n\x0e\x61ugmentor_type\x18\x01 \x02(\t\x12\x12\n\x08\x61ug_prob\x18\x03 \x01(\x02H\x00\x12\x30\n\rcustom_config\x18\x05 \x01(\x0b\x32\x17.google.protobuf.StructH\x00\x42\x12\n\x10\x61ugmentor_config')
   ,
   dependencies=[google_dot_protobuf_dot_struct__pb2.DESCRIPTOR,])
-_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 
 
@@ -41,28 +40,28 @@ _AUGMENTORCONFIG = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='aug_prob', full_name='rv.protos.AugmentorConfig.aug_prob', index=1,
       number=3, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='custom_config', full_name='rv.protos.AugmentorConfig.custom_config', index=2,
       number=5, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
@@ -83,6 +82,7 @@ _AUGMENTORCONFIG.oneofs_by_name['augmentor_config'].fields.append(
   _AUGMENTORCONFIG.fields_by_name['custom_config'])
 _AUGMENTORCONFIG.fields_by_name['custom_config'].containing_oneof = _AUGMENTORCONFIG.oneofs_by_name['augmentor_config']
 DESCRIPTOR.message_types_by_name['AugmentorConfig'] = _AUGMENTORCONFIG
+_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 AugmentorConfig = _reflection.GeneratedProtocolMessageType('AugmentorConfig', (_message.Message,), dict(
   DESCRIPTOR = _AUGMENTORCONFIG,

@@ -7,7 +7,6 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
-from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -21,10 +20,10 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='rastervision/protos/tf_object_detection/matcher.proto',
   package='rastervision.protos.tf_object_detection',
   syntax='proto2',
+  serialized_options=None,
   serialized_pb=_b('\n5rastervision/protos/tf_object_detection/matcher.proto\x12\'rastervision.protos.tf_object_detection\x1a<rastervision/protos/tf_object_detection/argmax_matcher.proto\x1a?rastervision/protos/tf_object_detection/bipartite_matcher.proto\"\xc4\x01\n\x07Matcher\x12P\n\x0e\x61rgmax_matcher\x18\x01 \x01(\x0b\x32\x36.rastervision.protos.tf_object_detection.ArgMaxMatcherH\x00\x12V\n\x11\x62ipartite_matcher\x18\x02 \x01(\x0b\x32\x39.rastervision.protos.tf_object_detection.BipartiteMatcherH\x00\x42\x0f\n\rmatcher_oneof')
   ,
   dependencies=[rastervision_dot_protos_dot_tf__object__detection_dot_argmax__matcher__pb2.DESCRIPTOR,rastervision_dot_protos_dot_tf__object__detection_dot_bipartite__matcher__pb2.DESCRIPTOR,])
-_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 
 
@@ -42,21 +41,21 @@ _MATCHER = _descriptor.Descriptor(
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='bipartite_matcher', full_name='rastervision.protos.tf_object_detection.Matcher.bipartite_matcher', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
@@ -78,6 +77,7 @@ _MATCHER.oneofs_by_name['matcher_oneof'].fields.append(
   _MATCHER.fields_by_name['bipartite_matcher'])
 _MATCHER.fields_by_name['bipartite_matcher'].containing_oneof = _MATCHER.oneofs_by_name['matcher_oneof']
 DESCRIPTOR.message_types_by_name['Matcher'] = _MATCHER
+_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 Matcher = _reflection.GeneratedProtocolMessageType('Matcher', (_message.Message,), dict(
   DESCRIPTOR = _MATCHER,

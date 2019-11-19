@@ -7,7 +7,6 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
-from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -20,10 +19,10 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='rastervision/protos/vector_source.proto',
   package='rv.protos',
   syntax='proto2',
+  serialized_options=None,
   serialized_pb=_b('\n\'rastervision/protos/vector_source.proto\x12\trv.protos\x1a\x1cgoogle/protobuf/struct.proto\"\xe5\x03\n\x12VectorSourceConfig\x12;\n\x07mbtiles\x18\x01 \x01(\x0b\x32(.rv.protos.VectorSourceConfig.VectorTileH\x00\x12\x38\n\x07geojson\x18\x02 \x01(\x0b\x32%.rv.protos.VectorSourceConfig.GeoJSONH\x00\x12\x30\n\rcustom_config\x18\x03 \x01(\x0b\x32\x17.google.protobuf.StructH\x00\x12\x13\n\x0bsource_type\x18\x04 \x02(\t\x12\x33\n\x12\x63lass_id_to_filter\x18\x05 \x01(\x0b\x32\x17.google.protobuf.Struct\x12\x18\n\x10\x64\x65\x66\x61ult_class_id\x18\x06 \x01(\x05\x12*\n\tline_bufs\x18\x07 \x01(\x0b\x32\x17.google.protobuf.Struct\x12+\n\npoint_bufs\x18\x08 \x01(\x0b\x32\x17.google.protobuf.Struct\x1a\x39\n\nVectorTile\x12\x0b\n\x03uri\x18\x01 \x02(\t\x12\x0c\n\x04zoom\x18\x02 \x02(\x05\x12\x10\n\x08id_field\x18\x03 \x02(\t\x1a\x16\n\x07GeoJSON\x12\x0b\n\x03uri\x18\x01 \x02(\tB\x16\n\x14vector_source_config')
   ,
   dependencies=[google_dot_protobuf_dot_struct__pb2.DESCRIPTOR,])
-_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 
 
@@ -41,28 +40,28 @@ _VECTORSOURCECONFIG_VECTORTILE = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='zoom', full_name='rv.protos.VectorSourceConfig.VectorTile.zoom', index=1,
       number=2, type=5, cpp_type=1, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='id_field', full_name='rv.protos.VectorSourceConfig.VectorTile.id_field', index=2,
       number=3, type=9, cpp_type=9, label=2,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
@@ -85,14 +84,14 @@ _VECTORSOURCECONFIG_GEOJSON = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
@@ -115,63 +114,63 @@ _VECTORSOURCECONFIG = _descriptor.Descriptor(
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='geojson', full_name='rv.protos.VectorSourceConfig.geojson', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='custom_config', full_name='rv.protos.VectorSourceConfig.custom_config', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='source_type', full_name='rv.protos.VectorSourceConfig.source_type', index=3,
       number=4, type=9, cpp_type=9, label=2,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='class_id_to_filter', full_name='rv.protos.VectorSourceConfig.class_id_to_filter', index=4,
       number=5, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='default_class_id', full_name='rv.protos.VectorSourceConfig.default_class_id', index=5,
       number=6, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='line_bufs', full_name='rv.protos.VectorSourceConfig.line_bufs', index=6,
       number=7, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='point_bufs', full_name='rv.protos.VectorSourceConfig.point_bufs', index=7,
       number=8, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[_VECTORSOURCECONFIG_VECTORTILE, _VECTORSOURCECONFIG_GEOJSON, ],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
@@ -202,6 +201,7 @@ _VECTORSOURCECONFIG.oneofs_by_name['vector_source_config'].fields.append(
   _VECTORSOURCECONFIG.fields_by_name['custom_config'])
 _VECTORSOURCECONFIG.fields_by_name['custom_config'].containing_oneof = _VECTORSOURCECONFIG.oneofs_by_name['vector_source_config']
 DESCRIPTOR.message_types_by_name['VectorSourceConfig'] = _VECTORSOURCECONFIG
+_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 VectorSourceConfig = _reflection.GeneratedProtocolMessageType('VectorSourceConfig', (_message.Message,), dict(
 

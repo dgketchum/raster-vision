@@ -7,7 +7,6 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
-from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -22,10 +21,10 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='rastervision/protos/scene.proto',
   package='rv.protos',
   syntax='proto2',
+  serialized_options=None,
   serialized_pb=_b('\n\x1frastervision/protos/scene.proto\x12\trv.protos\x1a\'rastervision/protos/raster_source.proto\x1a&rastervision/protos/label_source.proto\x1a%rastervision/protos/label_store.proto\"\xf0\x01\n\x0bSceneConfig\x12\n\n\x02id\x18\x01 \x02(\t\x12\x34\n\rraster_source\x18\x02 \x02(\x0b\x32\x1d.rv.protos.RasterSourceConfig\x12?\n\x19ground_truth_label_source\x18\x03 \x01(\x0b\x32\x1c.rv.protos.LabelSourceConfig\x12;\n\x16prediction_label_store\x18\x04 \x01(\x0b\x32\x1b.rv.protos.LabelStoreConfig\x12\x0f\n\x07\x61oi_uri\x18\x05 \x01(\t\x12\x10\n\x08\x61oi_uris\x18\x06 \x03(\t')
   ,
   dependencies=[rastervision_dot_protos_dot_raster__source__pb2.DESCRIPTOR,rastervision_dot_protos_dot_label__source__pb2.DESCRIPTOR,rastervision_dot_protos_dot_label__store__pb2.DESCRIPTOR,])
-_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 
 
@@ -43,49 +42,49 @@ _SCENECONFIG = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='raster_source', full_name='rv.protos.SceneConfig.raster_source', index=1,
       number=2, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='ground_truth_label_source', full_name='rv.protos.SceneConfig.ground_truth_label_source', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='prediction_label_store', full_name='rv.protos.SceneConfig.prediction_label_store', index=3,
       number=4, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='aoi_uri', full_name='rv.protos.SceneConfig.aoi_uri', index=4,
       number=5, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='aoi_uris', full_name='rv.protos.SceneConfig.aoi_uris', index=5,
       number=6, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
@@ -99,6 +98,7 @@ _SCENECONFIG.fields_by_name['raster_source'].message_type = rastervision_dot_pro
 _SCENECONFIG.fields_by_name['ground_truth_label_source'].message_type = rastervision_dot_protos_dot_label__source__pb2._LABELSOURCECONFIG
 _SCENECONFIG.fields_by_name['prediction_label_store'].message_type = rastervision_dot_protos_dot_label__store__pb2._LABELSTORECONFIG
 DESCRIPTOR.message_types_by_name['SceneConfig'] = _SCENECONFIG
+_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 SceneConfig = _reflection.GeneratedProtocolMessageType('SceneConfig', (_message.Message,), dict(
   DESCRIPTOR = _SCENECONFIG,

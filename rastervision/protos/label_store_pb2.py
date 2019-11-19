@@ -7,7 +7,6 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
-from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -20,10 +19,10 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='rastervision/protos/label_store.proto',
   package='rv.protos',
   syntax='proto2',
-  serialized_pb=_b('\n%rastervision/protos/label_store.proto\x12\trv.protos\x1a\x1cgoogle/protobuf/struct.proto\"\xd5\x05\n\x10LabelStoreConfig\x12\x12\n\nstore_type\x18\x01 \x02(\t\x12\r\n\x03uri\x18\x02 \x01(\tH\x00\x12i\n\"semantic_segmentation_raster_store\x18\x03 \x01(\x0b\x32;.rv.protos.LabelStoreConfig.SemanticSegmentationRasterStoreH\x00\x12\x30\n\rcustom_config\x18\x04 \x01(\x0b\x32\x17.google.protobuf.StructH\x00\x1a\xea\x03\n\x1fSemanticSegmentationRasterStore\x12\x0b\n\x03uri\x18\x01 \x01(\t\x12\x12\n\x03rgb\x18\x02 \x01(\x08:\x05\x66\x61lse\x12_\n\rvector_output\x18\x03 \x03(\x0b\x32H.rv.protos.LabelStoreConfig.SemanticSegmentationRasterStore.VectorOutput\x1a\x89\x01\n\x0f\x42uildingOptions\x12\x1f\n\x10min_aspect_ratio\x18\x01 \x01(\x02:\x05\x31.618\x12\x10\n\x08min_area\x18\x02 \x01(\x02\x12!\n\x14\x65lement_width_factor\x18\x03 \x01(\x02:\x03\x30.5\x12 \n\x11\x65lement_thickness\x18\x04 \x01(\x02:\x05\x30.001\x1a\xb8\x01\n\x0cVectorOutput\x12\x12\n\x07\x64\x65noise\x18\x01 \x01(\x05:\x01\x30\x12\r\n\x03uri\x18\x02 \x01(\t:\x00\x12\x0c\n\x04mode\x18\x03 \x02(\t\x12\x10\n\x08\x63lass_id\x18\x04 \x02(\x05\x12\x65\n\x10\x62uilding_options\x18\x05 \x01(\x0b\x32K.rv.protos.LabelStoreConfig.SemanticSegmentationRasterStore.BuildingOptionsB\x14\n\x12label_store_config')
+  serialized_options=None,
+  serialized_pb=_b('\n%rastervision/protos/label_store.proto\x12\trv.protos\x1a\x1cgoogle/protobuf/struct.proto\"\xad\n\n\x10LabelStoreConfig\x12\x12\n\nstore_type\x18\x01 \x02(\t\x12\r\n\x03uri\x18\x02 \x01(\tH\x00\x12i\n\"semantic_segmentation_raster_store\x18\x03 \x01(\x0b\x32;.rv.protos.LabelStoreConfig.SemanticSegmentationRasterStoreH\x00\x12i\n\"instance_segmentation_raster_store\x18\x04 \x01(\x0b\x32;.rv.protos.LabelStoreConfig.InstanceSegmentationRasterStoreH\x00\x12\x30\n\rcustom_config\x18\x05 \x01(\x0b\x32\x17.google.protobuf.StructH\x00\x1a\xea\x03\n\x1fSemanticSegmentationRasterStore\x12\x0b\n\x03uri\x18\x01 \x01(\t\x12\x12\n\x03rgb\x18\x02 \x01(\x08:\x05\x66\x61lse\x12_\n\rvector_output\x18\x03 \x03(\x0b\x32H.rv.protos.LabelStoreConfig.SemanticSegmentationRasterStore.VectorOutput\x1a\x89\x01\n\x0f\x42uildingOptions\x12\x1f\n\x10min_aspect_ratio\x18\x01 \x01(\x02:\x05\x31.618\x12\x10\n\x08min_area\x18\x02 \x01(\x02\x12!\n\x14\x65lement_width_factor\x18\x03 \x01(\x02:\x03\x30.5\x12 \n\x11\x65lement_thickness\x18\x04 \x01(\x02:\x05\x30.001\x1a\xb8\x01\n\x0cVectorOutput\x12\x12\n\x07\x64\x65noise\x18\x01 \x01(\x05:\x01\x30\x12\r\n\x03uri\x18\x02 \x01(\t:\x00\x12\x0c\n\x04mode\x18\x03 \x02(\t\x12\x10\n\x08\x63lass_id\x18\x04 \x02(\x05\x12\x65\n\x10\x62uilding_options\x18\x05 \x01(\x0b\x32K.rv.protos.LabelStoreConfig.SemanticSegmentationRasterStore.BuildingOptions\x1a\xea\x03\n\x1fInstanceSegmentationRasterStore\x12\x0b\n\x03uri\x18\x01 \x01(\t\x12\x12\n\x03rgb\x18\x02 \x01(\x08:\x05\x66\x61lse\x12_\n\rvector_output\x18\x03 \x03(\x0b\x32H.rv.protos.LabelStoreConfig.InstanceSegmentationRasterStore.VectorOutput\x1a\x89\x01\n\x0f\x42uildingOptions\x12\x1f\n\x10min_aspect_ratio\x18\x01 \x01(\x02:\x05\x31.618\x12\x10\n\x08min_area\x18\x02 \x01(\x02\x12!\n\x14\x65lement_width_factor\x18\x03 \x01(\x02:\x03\x30.5\x12 \n\x11\x65lement_thickness\x18\x04 \x01(\x02:\x05\x30.001\x1a\xb8\x01\n\x0cVectorOutput\x12\x12\n\x07\x64\x65noise\x18\x01 \x01(\x05:\x01\x30\x12\r\n\x03uri\x18\x02 \x01(\t:\x00\x12\x0c\n\x04mode\x18\x03 \x02(\t\x12\x10\n\x08\x63lass_id\x18\x04 \x02(\x05\x12\x65\n\x10\x62uilding_options\x18\x05 \x01(\x0b\x32K.rv.protos.LabelStoreConfig.InstanceSegmentationRasterStore.BuildingOptionsB\x14\n\x12label_store_config')
   ,
   dependencies=[google_dot_protobuf_dot_struct__pb2.DESCRIPTOR,])
-_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 
 
@@ -41,42 +40,42 @@ _LABELSTORECONFIG_SEMANTICSEGMENTATIONRASTERSTORE_BUILDINGOPTIONS = _descriptor.
       has_default_value=True, default_value=float(1.618),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='min_area', full_name='rv.protos.LabelStoreConfig.SemanticSegmentationRasterStore.BuildingOptions.min_area', index=1,
       number=2, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='element_width_factor', full_name='rv.protos.LabelStoreConfig.SemanticSegmentationRasterStore.BuildingOptions.element_width_factor', index=2,
       number=3, type=2, cpp_type=6, label=1,
       has_default_value=True, default_value=float(0.5),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='element_thickness', full_name='rv.protos.LabelStoreConfig.SemanticSegmentationRasterStore.BuildingOptions.element_thickness', index=3,
       number=4, type=2, cpp_type=6, label=1,
       has_default_value=True, default_value=float(0.001),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=462,
-  serialized_end=599,
+  serialized_start=569,
+  serialized_end=706,
 )
 
 _LABELSTORECONFIG_SEMANTICSEGMENTATIONRASTERSTORE_VECTOROUTPUT = _descriptor.Descriptor(
@@ -92,49 +91,49 @@ _LABELSTORECONFIG_SEMANTICSEGMENTATIONRASTERSTORE_VECTOROUTPUT = _descriptor.Des
       has_default_value=True, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='uri', full_name='rv.protos.LabelStoreConfig.SemanticSegmentationRasterStore.VectorOutput.uri', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=True, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='mode', full_name='rv.protos.LabelStoreConfig.SemanticSegmentationRasterStore.VectorOutput.mode', index=2,
       number=3, type=9, cpp_type=9, label=2,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='class_id', full_name='rv.protos.LabelStoreConfig.SemanticSegmentationRasterStore.VectorOutput.class_id', index=3,
       number=4, type=5, cpp_type=1, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='building_options', full_name='rv.protos.LabelStoreConfig.SemanticSegmentationRasterStore.VectorOutput.building_options', index=4,
       number=5, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=602,
-  serialized_end=786,
+  serialized_start=709,
+  serialized_end=893,
 )
 
 _LABELSTORECONFIG_SEMANTICSEGMENTATIONRASTERSTORE = _descriptor.Descriptor(
@@ -150,35 +149,188 @@ _LABELSTORECONFIG_SEMANTICSEGMENTATIONRASTERSTORE = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='rgb', full_name='rv.protos.LabelStoreConfig.SemanticSegmentationRasterStore.rgb', index=1,
       number=2, type=8, cpp_type=7, label=1,
       has_default_value=True, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='vector_output', full_name='rv.protos.LabelStoreConfig.SemanticSegmentationRasterStore.vector_output', index=2,
       number=3, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[_LABELSTORECONFIG_SEMANTICSEGMENTATIONRASTERSTORE_BUILDINGOPTIONS, _LABELSTORECONFIG_SEMANTICSEGMENTATIONRASTERSTORE_VECTOROUTPUT, ],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=296,
-  serialized_end=786,
+  serialized_start=403,
+  serialized_end=893,
+)
+
+_LABELSTORECONFIG_INSTANCESEGMENTATIONRASTERSTORE_BUILDINGOPTIONS = _descriptor.Descriptor(
+  name='BuildingOptions',
+  full_name='rv.protos.LabelStoreConfig.InstanceSegmentationRasterStore.BuildingOptions',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='min_aspect_ratio', full_name='rv.protos.LabelStoreConfig.InstanceSegmentationRasterStore.BuildingOptions.min_aspect_ratio', index=0,
+      number=1, type=2, cpp_type=6, label=1,
+      has_default_value=True, default_value=float(1.618),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='min_area', full_name='rv.protos.LabelStoreConfig.InstanceSegmentationRasterStore.BuildingOptions.min_area', index=1,
+      number=2, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='element_width_factor', full_name='rv.protos.LabelStoreConfig.InstanceSegmentationRasterStore.BuildingOptions.element_width_factor', index=2,
+      number=3, type=2, cpp_type=6, label=1,
+      has_default_value=True, default_value=float(0.5),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='element_thickness', full_name='rv.protos.LabelStoreConfig.InstanceSegmentationRasterStore.BuildingOptions.element_thickness', index=3,
+      number=4, type=2, cpp_type=6, label=1,
+      has_default_value=True, default_value=float(0.001),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=569,
+  serialized_end=706,
+)
+
+_LABELSTORECONFIG_INSTANCESEGMENTATIONRASTERSTORE_VECTOROUTPUT = _descriptor.Descriptor(
+  name='VectorOutput',
+  full_name='rv.protos.LabelStoreConfig.InstanceSegmentationRasterStore.VectorOutput',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='denoise', full_name='rv.protos.LabelStoreConfig.InstanceSegmentationRasterStore.VectorOutput.denoise', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=True, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='uri', full_name='rv.protos.LabelStoreConfig.InstanceSegmentationRasterStore.VectorOutput.uri', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=True, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='mode', full_name='rv.protos.LabelStoreConfig.InstanceSegmentationRasterStore.VectorOutput.mode', index=2,
+      number=3, type=9, cpp_type=9, label=2,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='class_id', full_name='rv.protos.LabelStoreConfig.InstanceSegmentationRasterStore.VectorOutput.class_id', index=3,
+      number=4, type=5, cpp_type=1, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='building_options', full_name='rv.protos.LabelStoreConfig.InstanceSegmentationRasterStore.VectorOutput.building_options', index=4,
+      number=5, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1202,
+  serialized_end=1386,
+)
+
+_LABELSTORECONFIG_INSTANCESEGMENTATIONRASTERSTORE = _descriptor.Descriptor(
+  name='InstanceSegmentationRasterStore',
+  full_name='rv.protos.LabelStoreConfig.InstanceSegmentationRasterStore',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='uri', full_name='rv.protos.LabelStoreConfig.InstanceSegmentationRasterStore.uri', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='rgb', full_name='rv.protos.LabelStoreConfig.InstanceSegmentationRasterStore.rgb', index=1,
+      number=2, type=8, cpp_type=7, label=1,
+      has_default_value=True, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='vector_output', full_name='rv.protos.LabelStoreConfig.InstanceSegmentationRasterStore.vector_output', index=2,
+      number=3, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[_LABELSTORECONFIG_INSTANCESEGMENTATIONRASTERSTORE_BUILDINGOPTIONS, _LABELSTORECONFIG_INSTANCESEGMENTATIONRASTERSTORE_VECTOROUTPUT, ],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=896,
+  serialized_end=1386,
 )
 
 _LABELSTORECONFIG = _descriptor.Descriptor(
@@ -194,35 +346,42 @@ _LABELSTORECONFIG = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='uri', full_name='rv.protos.LabelStoreConfig.uri', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='semantic_segmentation_raster_store', full_name='rv.protos.LabelStoreConfig.semantic_segmentation_raster_store', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='custom_config', full_name='rv.protos.LabelStoreConfig.custom_config', index=3,
+      name='instance_segmentation_raster_store', full_name='rv.protos.LabelStoreConfig.instance_segmentation_raster_store', index=3,
       number=4, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='custom_config', full_name='rv.protos.LabelStoreConfig.custom_config', index=4,
+      number=5, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
-  nested_types=[_LABELSTORECONFIG_SEMANTICSEGMENTATIONRASTERSTORE, ],
+  nested_types=[_LABELSTORECONFIG_SEMANTICSEGMENTATIONRASTERSTORE, _LABELSTORECONFIG_INSTANCESEGMENTATIONRASTERSTORE, ],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
@@ -232,7 +391,7 @@ _LABELSTORECONFIG = _descriptor.Descriptor(
       index=0, containing_type=None, fields=[]),
   ],
   serialized_start=83,
-  serialized_end=808,
+  serialized_end=1408,
 )
 
 _LABELSTORECONFIG_SEMANTICSEGMENTATIONRASTERSTORE_BUILDINGOPTIONS.containing_type = _LABELSTORECONFIG_SEMANTICSEGMENTATIONRASTERSTORE
@@ -240,7 +399,13 @@ _LABELSTORECONFIG_SEMANTICSEGMENTATIONRASTERSTORE_VECTOROUTPUT.fields_by_name['b
 _LABELSTORECONFIG_SEMANTICSEGMENTATIONRASTERSTORE_VECTOROUTPUT.containing_type = _LABELSTORECONFIG_SEMANTICSEGMENTATIONRASTERSTORE
 _LABELSTORECONFIG_SEMANTICSEGMENTATIONRASTERSTORE.fields_by_name['vector_output'].message_type = _LABELSTORECONFIG_SEMANTICSEGMENTATIONRASTERSTORE_VECTOROUTPUT
 _LABELSTORECONFIG_SEMANTICSEGMENTATIONRASTERSTORE.containing_type = _LABELSTORECONFIG
+_LABELSTORECONFIG_INSTANCESEGMENTATIONRASTERSTORE_BUILDINGOPTIONS.containing_type = _LABELSTORECONFIG_INSTANCESEGMENTATIONRASTERSTORE
+_LABELSTORECONFIG_INSTANCESEGMENTATIONRASTERSTORE_VECTOROUTPUT.fields_by_name['building_options'].message_type = _LABELSTORECONFIG_INSTANCESEGMENTATIONRASTERSTORE_BUILDINGOPTIONS
+_LABELSTORECONFIG_INSTANCESEGMENTATIONRASTERSTORE_VECTOROUTPUT.containing_type = _LABELSTORECONFIG_INSTANCESEGMENTATIONRASTERSTORE
+_LABELSTORECONFIG_INSTANCESEGMENTATIONRASTERSTORE.fields_by_name['vector_output'].message_type = _LABELSTORECONFIG_INSTANCESEGMENTATIONRASTERSTORE_VECTOROUTPUT
+_LABELSTORECONFIG_INSTANCESEGMENTATIONRASTERSTORE.containing_type = _LABELSTORECONFIG
 _LABELSTORECONFIG.fields_by_name['semantic_segmentation_raster_store'].message_type = _LABELSTORECONFIG_SEMANTICSEGMENTATIONRASTERSTORE
+_LABELSTORECONFIG.fields_by_name['instance_segmentation_raster_store'].message_type = _LABELSTORECONFIG_INSTANCESEGMENTATIONRASTERSTORE
 _LABELSTORECONFIG.fields_by_name['custom_config'].message_type = google_dot_protobuf_dot_struct__pb2._STRUCT
 _LABELSTORECONFIG.oneofs_by_name['label_store_config'].fields.append(
   _LABELSTORECONFIG.fields_by_name['uri'])
@@ -249,9 +414,13 @@ _LABELSTORECONFIG.oneofs_by_name['label_store_config'].fields.append(
   _LABELSTORECONFIG.fields_by_name['semantic_segmentation_raster_store'])
 _LABELSTORECONFIG.fields_by_name['semantic_segmentation_raster_store'].containing_oneof = _LABELSTORECONFIG.oneofs_by_name['label_store_config']
 _LABELSTORECONFIG.oneofs_by_name['label_store_config'].fields.append(
+  _LABELSTORECONFIG.fields_by_name['instance_segmentation_raster_store'])
+_LABELSTORECONFIG.fields_by_name['instance_segmentation_raster_store'].containing_oneof = _LABELSTORECONFIG.oneofs_by_name['label_store_config']
+_LABELSTORECONFIG.oneofs_by_name['label_store_config'].fields.append(
   _LABELSTORECONFIG.fields_by_name['custom_config'])
 _LABELSTORECONFIG.fields_by_name['custom_config'].containing_oneof = _LABELSTORECONFIG.oneofs_by_name['label_store_config']
 DESCRIPTOR.message_types_by_name['LabelStoreConfig'] = _LABELSTORECONFIG
+_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 LabelStoreConfig = _reflection.GeneratedProtocolMessageType('LabelStoreConfig', (_message.Message,), dict(
 
@@ -275,6 +444,27 @@ LabelStoreConfig = _reflection.GeneratedProtocolMessageType('LabelStoreConfig', 
     # @@protoc_insertion_point(class_scope:rv.protos.LabelStoreConfig.SemanticSegmentationRasterStore)
     ))
   ,
+
+  InstanceSegmentationRasterStore = _reflection.GeneratedProtocolMessageType('InstanceSegmentationRasterStore', (_message.Message,), dict(
+
+    BuildingOptions = _reflection.GeneratedProtocolMessageType('BuildingOptions', (_message.Message,), dict(
+      DESCRIPTOR = _LABELSTORECONFIG_INSTANCESEGMENTATIONRASTERSTORE_BUILDINGOPTIONS,
+      __module__ = 'rastervision.protos.label_store_pb2'
+      # @@protoc_insertion_point(class_scope:rv.protos.LabelStoreConfig.InstanceSegmentationRasterStore.BuildingOptions)
+      ))
+    ,
+
+    VectorOutput = _reflection.GeneratedProtocolMessageType('VectorOutput', (_message.Message,), dict(
+      DESCRIPTOR = _LABELSTORECONFIG_INSTANCESEGMENTATIONRASTERSTORE_VECTOROUTPUT,
+      __module__ = 'rastervision.protos.label_store_pb2'
+      # @@protoc_insertion_point(class_scope:rv.protos.LabelStoreConfig.InstanceSegmentationRasterStore.VectorOutput)
+      ))
+    ,
+    DESCRIPTOR = _LABELSTORECONFIG_INSTANCESEGMENTATIONRASTERSTORE,
+    __module__ = 'rastervision.protos.label_store_pb2'
+    # @@protoc_insertion_point(class_scope:rv.protos.LabelStoreConfig.InstanceSegmentationRasterStore)
+    ))
+  ,
   DESCRIPTOR = _LABELSTORECONFIG,
   __module__ = 'rastervision.protos.label_store_pb2'
   # @@protoc_insertion_point(class_scope:rv.protos.LabelStoreConfig)
@@ -283,6 +473,9 @@ _sym_db.RegisterMessage(LabelStoreConfig)
 _sym_db.RegisterMessage(LabelStoreConfig.SemanticSegmentationRasterStore)
 _sym_db.RegisterMessage(LabelStoreConfig.SemanticSegmentationRasterStore.BuildingOptions)
 _sym_db.RegisterMessage(LabelStoreConfig.SemanticSegmentationRasterStore.VectorOutput)
+_sym_db.RegisterMessage(LabelStoreConfig.InstanceSegmentationRasterStore)
+_sym_db.RegisterMessage(LabelStoreConfig.InstanceSegmentationRasterStore.BuildingOptions)
+_sym_db.RegisterMessage(LabelStoreConfig.InstanceSegmentationRasterStore.VectorOutput)
 
 
 # @@protoc_insertion_point(module_scope)

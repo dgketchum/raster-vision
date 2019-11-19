@@ -7,7 +7,6 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
-from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -19,9 +18,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='rastervision/protos/tf_object_detection/mean_stddev_box_coder.proto',
   package='rastervision.protos.tf_object_detection',
   syntax='proto2',
+  serialized_options=None,
   serialized_pb=_b('\nCrastervision/protos/tf_object_detection/mean_stddev_box_coder.proto\x12\'rastervision.protos.tf_object_detection\"*\n\x12MeanStddevBoxCoder\x12\x14\n\x06stddev\x18\x01 \x01(\x02:\x04\x30.01')
 )
-_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 
 
@@ -39,14 +38,14 @@ _MEANSTDDEVBOXCODER = _descriptor.Descriptor(
       has_default_value=True, default_value=float(0.01),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
@@ -57,6 +56,7 @@ _MEANSTDDEVBOXCODER = _descriptor.Descriptor(
 )
 
 DESCRIPTOR.message_types_by_name['MeanStddevBoxCoder'] = _MEANSTDDEVBOXCODER
+_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 MeanStddevBoxCoder = _reflection.GeneratedProtocolMessageType('MeanStddevBoxCoder', (_message.Message,), dict(
   DESCRIPTOR = _MEANSTDDEVBOXCODER,

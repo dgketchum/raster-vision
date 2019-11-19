@@ -7,7 +7,6 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
-from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -20,10 +19,10 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='rastervision/protos/raster_transformer.proto',
   package='rv.protos',
   syntax='proto2',
+  serialized_options=None,
   serialized_pb=_b('\n,rastervision/protos/raster_transformer.proto\x12\trv.protos\x1a\x1cgoogle/protobuf/struct.proto\"\x97\x01\n\x17RasterTransformerConfig\x12\x18\n\x10transformer_type\x18\x01 \x02(\t\x12\x13\n\tstats_uri\x18\x04 \x01(\tH\x00\x12\x30\n\rcustom_config\x18\x05 \x01(\x0b\x32\x17.google.protobuf.StructH\x00\x42\x1b\n\x19raster_transformer_config')
   ,
   dependencies=[google_dot_protobuf_dot_struct__pb2.DESCRIPTOR,])
-_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 
 
@@ -41,28 +40,28 @@ _RASTERTRANSFORMERCONFIG = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='stats_uri', full_name='rv.protos.RasterTransformerConfig.stats_uri', index=1,
       number=4, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='custom_config', full_name='rv.protos.RasterTransformerConfig.custom_config', index=2,
       number=5, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
@@ -83,6 +82,7 @@ _RASTERTRANSFORMERCONFIG.oneofs_by_name['raster_transformer_config'].fields.appe
   _RASTERTRANSFORMERCONFIG.fields_by_name['custom_config'])
 _RASTERTRANSFORMERCONFIG.fields_by_name['custom_config'].containing_oneof = _RASTERTRANSFORMERCONFIG.oneofs_by_name['raster_transformer_config']
 DESCRIPTOR.message_types_by_name['RasterTransformerConfig'] = _RASTERTRANSFORMERCONFIG
+_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 RasterTransformerConfig = _reflection.GeneratedProtocolMessageType('RasterTransformerConfig', (_message.Message,), dict(
   DESCRIPTOR = _RASTERTRANSFORMERCONFIG,
