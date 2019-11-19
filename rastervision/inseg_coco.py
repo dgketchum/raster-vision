@@ -4,6 +4,7 @@ import os
 import rasterio
 from rasterio.dtypes import int16
 from numpy import zeros
+from PIL.ImageColor import colormap
 # from pycocotools.coco import COCO
 
 import rastervision as rv
@@ -20,31 +21,17 @@ else:
     ROOT_URI = '/opt/data/training_data'
     PROCESSED_URI = os.path.join(ROOT_URI, 'example', 'COCO')
 
-COCO_INSTANCE_CATEGORY_NAMES = [
-    '__background__', 'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
-    'train', 'truck', 'boat', 'traffic light', 'fire hydrant', 'N/A', 'stop sign',
-    'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow',
-    'elephant', 'bear', 'zebra', 'giraffe', 'N/A', 'backpack', 'umbrella', 'N/A', 'N/A',
-    'handbag', 'tie', 'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball',
-    'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket',
-    'bottle', 'N/A', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl',
-    'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza',
-    'donut', 'cake', 'chair', 'couch', 'potted plant', 'bed', 'N/A', 'dining table',
-    'N/A', 'N/A', 'toilet', 'N/A', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone',
-    'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'N/A', 'book',
-    'clock', 'vase', 'scissors', 'teddy bear', 'hair drier',  'a', 'b', 'c', 'd', 'e', 'f',
-    'g', 'h', 'i', 'j'
-]
+COCO_INSTANCE_CATEGORY_NAMES = [str(x) for x in range(91)]
+colors = [k for k in colormap.keys()]
 
 MODEL_URI = 'https://download.pytorch.org/models/maskrcnn_resnet50_fpn_coco-bf2d0c1e.pth',
 
 
 def get_images(t):
     l_dir_ = os.path.join(PROCESSED_URI, 'label_{}'.format(t))
-    i_dir_ = os.path.join(PROCESSED_URI, 'image_{}'.format(t))
     l_l = [os.path.join(l_dir_, x) for x in os.listdir(l_dir_)]
-    id_ = [os.path.basename(x).split('.')[0] for x in l_l]
-    i_l = [os.path.join(i_dir_, x) for x in os.listdir(i_dir_) if os.path.basename(x).split('.')[0] in id_]
+    i_l = [x.replace('label_{}'.format(t), 'image_{}'.format(t)) for x in l_l]
+    i_l = [x.replace('.tif', '.jpg') for x in i_l]
     return list(zip(i_l, l_l))
 
 
@@ -62,10 +49,10 @@ class InstanceSegmentationExperiments(rv.ExperimentSet):
             test_scene_info = get_scene_info('test')
 
         exp_id = 'coco-inseg'
-        classes = {k: v for (v, k) in enumerate(COCO_INSTANCE_CATEGORY_NAMES)}
+        classes = {k: (v, colors[v]) for (v, k) in enumerate(COCO_INSTANCE_CATEGORY_NAMES)}
 
         debug = True
-        num_epochs = 100
+        num_epochs = 2
         batch_size = 5
 
         task = rv.TaskConfig.builder(rv.INSTANCE_SEGMENTATION) \
@@ -87,9 +74,9 @@ class InstanceSegmentationExperiments(rv.ExperimentSet):
             debug=debug) \
             .build()
 
-        train_scenes = [make_scene(raster_source=x, label=y, task=task, mode='train') for x, y in train_scene_info]
-        val_scenes = [make_scene(raster_source=x, label=y, task=task, mode='val') for x, y in val_scene_info]
-        test_scenes = [make_scene(raster_source=x, label=y, task=task, mode='test') for x, y in test_scene_info]
+        train_scenes = [make_scene(raster=x, label=y, task=task, mode='train') for x, y in train_scene_info]
+        val_scenes = [make_scene(raster=x, label=y, task=task, mode='val') for x, y in val_scene_info]
+        test_scenes = [make_scene(raster=x, label=y, task=task, mode='test') for x, y in test_scene_info]
 
         dataset = rv.DatasetConfig.builder() \
             .with_train_scenes(train_scenes) \
@@ -109,8 +96,9 @@ class InstanceSegmentationExperiments(rv.ExperimentSet):
         return experiment
 
 
-def make_scene(raster_source, label, task, mode):
-    _id = os.path.splitext(os.path.basename(raster_source))[0]
+def make_scene(raster, label, task, mode):
+
+    _id = os.path.splitext(os.path.basename(raster))[0]
 
     label_raster_source = rv.RasterSourceConfig.builder(rv.RASTERIO_SOURCE) \
         .with_uri(label) \
@@ -123,12 +111,13 @@ def make_scene(raster_source, label, task, mode):
     uri = label.replace('label_{}'.format(mode), 'pred')
     label_store = rv.LabelStoreConfig.builder(rv.INSTANCE_SEGMENTATION_RASTER) \
         .with_uri(uri) \
+        .with_rgb(True) \
         .build()
 
     return rv.SceneConfig.builder() \
         .with_task(task) \
         .with_id(_id) \
-        .with_raster_source(raster_source, channel_order=[0, 1, 2]) \
+        .with_raster_source(raster, channel_order=[0, 1, 2]) \
         .with_label_store(label_store) \
         .with_label_source(label_source) \
         .build()
@@ -210,10 +199,10 @@ if __name__ == '__main__':
     i = InstanceSegmentationExperiments().exp_main()
     rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
 
-    # cmd = '/home/dgketchum/field_extraction/training_data/train/coco-inseg/command-config-0.json'
+    # cmd = '/home/dgketchum/field_extraction/training_data/chip/coco-inseg/command-config-0.json'
     # rv.runner.CommandRunner.run(cmd)
 
-    # cmd = '/home/dgketchum/field_extraction/training_data/eval/coco-inseg/command-config-0.json'
+    # cmd = '/home/dgketchum/field_extraction/training_data/predict/coco-inseg/command-config-0.json'
     # rv.runner.CommandRunner.run(cmd)
 
 # ====================================== EOF =================================================================
