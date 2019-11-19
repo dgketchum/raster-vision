@@ -55,7 +55,7 @@ class InstanceSegmentationConfig(TaskConfig):
 
     def to_proto(self):
         msg = super().to_proto()
-        chip_options = TaskConfigMsg.SemanticSegmentationConfig.ChipOptions(
+        chip_options = TaskConfigMsg.InstanceSegmentationConfig.ChipOptions(
             window_method=self.chip_options.window_method,
             target_classes=self.chip_options.target_classes,
             debug_chip_probability=self.chip_options.debug_chip_probability,
@@ -65,14 +65,14 @@ class InstanceSegmentationConfig(TaskConfig):
             target_count_threshold=self.chip_options.target_count_threshold,
             stride=self.chip_options.stride)
 
-        conf = TaskConfigMsg.SemanticSegmentationConfig(
+        conf = TaskConfigMsg.InstanceSegmentationConfig(
             chip_size=self.chip_size,
             predict_chip_size=self.predict_chip_size,
             class_items=self.class_map.to_proto(),
             chip_options=chip_options)
         msg.MergeFrom(
             TaskConfigMsg(
-                semantic_segmentation_config=conf,
+                instance_segmentation_config=conf,
                 predict_package_uri=self.predict_package_uri))
 
         return msg
@@ -94,7 +94,7 @@ class InstanceSegmentationConfigBuilder(TaskConfigBuilder):
         super().__init__(InstanceSegmentationConfig, config)
 
     def from_proto(self, msg):
-        conf = msg.semantic_segmentation_config
+        conf = msg.instance_segmentation_config
 
         negative_survival_probability = conf.chip_options \
                                             .negative_survival_probability
@@ -130,7 +130,7 @@ class InstanceSegmentationConfigBuilder(TaskConfigBuilder):
         max_classes = 256
         if len(self.config['class_map']) > max_classes:
             raise rv.ConfigError(
-                'Cannot use more than {} classes with semantic segmentation.'.
+                'Cannot use more than {} classes with instance segmentation.'.
                 format(max_classes))
 
     def with_classes(
@@ -179,7 +179,7 @@ class InstanceSegmentationConfigBuilder(TaskConfigBuilder):
                           chips_per_scene=1000,
                           target_count_threshold=1000,
                           stride=None):
-        """Sets semantic segmentation configurations for the Chip command.
+        """Sets instance segmentation configurations for the Chip command.
 
         Args:
             window_method: Window method to use for chipping. Options are:
@@ -199,7 +199,7 @@ class InstanceSegmentationConfigBuilder(TaskConfigBuilder):
                 size. Applies to the 'sliding_window' method.
 
         Returns:
-            SemanticSegmentationConfigBuilder
+            IntanceSegmentationConfigBuilder
         """
         b = deepcopy(self)
 
