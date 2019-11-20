@@ -52,7 +52,7 @@ class InstanceSegmentationExperiments(rv.ExperimentSet):
         classes = {k: (v, colors[v]) for (v, k) in enumerate(COCO_INSTANCE_CATEGORY_NAMES)}
 
         debug = True
-        num_epochs = 2
+        num_epochs = 1
         batch_size = 5
 
         task = rv.TaskConfig.builder(rv.INSTANCE_SEGMENTATION) \
@@ -196,13 +196,13 @@ def collate_annotations(img_dir_train):
 
 
 if __name__ == '__main__':
-    i = InstanceSegmentationExperiments().exp_main()
-    rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
+    # i = InstanceSegmentationExperiments().exp_main()
+    # rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
 
-    # cmd = '/home/dgketchum/field_extraction/training_data/chip/coco-inseg/command-config-0.json'
+    # cmd = '/home/dgketchum/field_extraction/training_data/train/coco-inseg/command-config-0.json'
     # rv.runner.CommandRunner.run(cmd)
 
-    # cmd = '/home/dgketchum/field_extraction/training_data/predict/coco-inseg/command-config-0.json'
-    # rv.runner.CommandRunner.run(cmd)
+    cmd = '/home/dgketchum/field_extraction/training_data/predict/coco-inseg/command-config-0.json'
+    rv.runner.CommandRunner.run(cmd)
 
 # ====================================== EOF =================================================================
