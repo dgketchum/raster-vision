@@ -149,9 +149,12 @@ class Task(object):
 
         for scene in scenes:
             with scene.activate():
-                labels = self.predict_scene(scene, tmp_dir)
-                label_store = scene.prediction_label_store
-                label_store.save(labels)
+                try:
+                    labels = self.predict_scene(scene, tmp_dir)
+                    label_store = scene.prediction_label_store
+                    label_store.save(labels)
+                except RuntimeError:
+                    print('failed on label store uri {}'.format(scene.prediction_label_store.uri))
 
                 if self.config.debug and self.config.predict_debug_uri:
                     self.save_debug_predict_image(
