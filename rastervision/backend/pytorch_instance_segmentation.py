@@ -17,6 +17,7 @@ import torch
 from torch import optim
 from torch.utils.tensorboard import SummaryWriter
 from torch.optim.lr_scheduler import CyclicLR
+from torchvision.transforms import Compose, ToTensor, Normalize
 import numpy as np
 
 from rastervision.utils.files import (get_local_path, make_dir, upload_or_copy,
@@ -25,7 +26,7 @@ from rastervision.utils.files import (get_local_path, make_dir, upload_or_copy,
                                       zipdir, file_to_json, json_to_file)
 from rastervision.utils.misc import save_img
 from rastervision.backend import Backend
-from rastervision.data.label import SemanticSegmentationLabels
+from rastervision.data.label import InstanceSegmentationLabels
 from rastervision.utils.misc import terminate_at_exit
 from rastervision.backend.torch_utils.instance_segmentation.plot import plot_xy
 from rastervision.backend.torch_utils.instance_segmentation.data import build_databunch
@@ -232,7 +233,7 @@ class PyTorchInstanceSegmentation(Backend):
         # Setup model
         num_labels = len(databunch.label_names)
         model = get_model(
-            self.train_opts.model_arch, num_labels, pretrained=True)
+            self.train_opts.model_arch, num_labels, pretrained=False)
         model = model.to(self.device)
         model_path = join(train_dir, 'model')
 
@@ -248,6 +249,7 @@ class PyTorchInstanceSegmentation(Backend):
         # Possibly resume training from checkpoint.
         start_epoch = 0
         train_state_path = join(train_dir, 'train_state.json')
+
         if isfile(train_state_path):
             log.info('Resuming from checkpoint: {}\n'.format(model_path))
             train_state = file_to_json(train_state_path)
@@ -387,15 +389,21 @@ class PyTorchInstanceSegmentation(Backend):
 
         chips = torch.Tensor(chips).permute((0, 3, 1, 2)) / 255.
         chips = chips.to(self.device)
-        model = self.model.eval()
 
+        if self.backend_opts.pretrained_uri:
+            norm = Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+            chips = norm(chips.squeeze(0))
+
+        chips = [torch.squeeze(chips).to(self.device)]
+
+        model = self.model.eval()
         with torch.no_grad():
-            out = model(chips)['out'].cpu()
+            out = model(chips)
 
         def label_fn(_window):
             if _window == windows[0]:
-                return out[0].argmax(0).squeeze().numpy()
+                return out[0]['masks'].cpu().argmax(0).squeeze().numpy()
             else:
                 raise ValueError('Trying to get labels for unknown window.')
 
-        return SemanticSegmentationLabels(windows, label_fn)
+        return InstanceSegmentationLabels(windows, label_fn)
