@@ -112,6 +112,7 @@ class InstanceSegmentationRasterStore(LabelStore):
 
         # https://github.com/mapbox/rasterio/blob/master/docs/quickstart.rst
         # https://rasterio.readthedocs.io/en/latest/topics/windowed-rw.html
+        print(local_path)
         with rasterio.open(
                 local_path,
                 'w',

@@ -6,7 +6,7 @@ from rastervision.data.label_store import (
     LabelStoreConfig, LabelStoreConfigBuilder, InstanceSegmentationRasterStore)
 from rastervision.protos.label_store_pb2 import LabelStoreConfig as LabelStoreConfigMsg
 
-# VectorOutput = LabelStoreConfigMsg.InstanceSegmentationRasterStore.VectorOutput
+VectorOutput = LabelStoreConfigMsg.InstanceSegmentationRasterStore.VectorOutput
 
 
 class InstanceSegmentationRasterStoreConfig(LabelStoreConfig):
@@ -16,66 +16,66 @@ class InstanceSegmentationRasterStoreConfig(LabelStoreConfig):
         self.vector_output = vector_output
         self.rgb = rgb
 
-    # def to_proto(self):
-    #     """Turn this configuration into a ProtoBuf message.
-    #
-    #     The fields in the message are as follows:
-    #         - `denoise` gives the radius of the structural element
-    #           used to remove high-frequency signals from the image.
-    #         - `uri` is the location where vector output should be
-    #           written
-    #         - `mode` is the vectorification mode (currently only
-    #           "polygons" and "buildings" are acceptable values).
-    #         - `class_id` specifies the predication class that is to
-    #           turned into vectors
-    #         - `building_options` communicates options useful for
-    #           vectorification of building predictions (it is intended
-    #           to break-up clusters of buildings):
-    #             - `min_aspect_ratio` is the ratio between length and
-    #               height (or height and length) of anything that can
-    #               be considered to be a cluster of buildings.  The
-    #               goal is to distinguish between rows of buildings and
-    #               (say) a single building.
-    #             - `min_area` is the minimum area of anything that can
-    #               be considered to be a cluster of buildings.  The
-    #               goal is to distinguish between buildings and
-    #               artifacts.
-    #             - `element_width_factor` is the width of the
-    #               structural element used to break building clusters
-    #               as a fraction of the width of the cluster.
-    #             - `element_thickness` is the thickness of the
-    #               structural element that is used to break building
-    #               clusters.
-    #     """
-    #     msg = super().to_proto()
-    #     if self.uri:
-    #         msg.instance_segmentation_raster_store.uri = self.uri
-    #     if self.vector_output:
-    #         ar = []
-    #         for vo in self.vector_output:
-    #             vo_msg = VectorOutput()
-    #             vo_msg.denoise = vo['denoise'] if 'denoise' in vo.keys() else 0
-    #             vo_msg.uri = vo['uri'] if 'uri' in vo.keys() else ''
-    #             vo_msg.mode = vo['mode']
-    #             vo_msg.class_id = vo['class_id']
-    #             if 'building_options' in vo.keys():
-    #                 options = vo['building_options']
-    #             else:
-    #                 options = {}
-    #             bldg_msg = vo_msg.building_options
-    #             if 'min_aspect_ratio' in options.keys():
-    #                 bldg_msg.min_aspect_ratio = options['min_aspect_ratio']
-    #             if 'min_area' in options.keys() and options['min_area']:
-    #                 bldg_msg.min_area = options['min_area']
-    #             if 'element_width_factor' in options.keys():
-    #                 bldg_msg.element_width_factor = options[
-    #                     'element_width_factor']
-    #             if 'element_thickness' in options.keys():
-    #                 bldg_msg.element_thickness = options['element_thickness']
-    #             ar.append(vo_msg)
-    #         msg.instance_segmentation_raster_store.vector_output.extend(ar)
-    #     msg.instance_segmentation_raster_store.rgb = self.rgb
-    #     return msg
+    def to_proto(self):
+        """Turn this configuration into a ProtoBuf message.
+
+        The fields in the message are as follows:
+            - `denoise` gives the radius of the structural element
+              used to remove high-frequency signals from the image.
+            - `uri` is the location where vector output should be
+              written
+            - `mode` is the vectorification mode (currently only
+              "polygons" and "buildings" are acceptable values).
+            - `class_id` specifies the predication class that is to
+              turned into vectors
+            - `building_options` communicates options useful for
+              vectorification of building predictions (it is intended
+              to break-up clusters of buildings):
+                - `min_aspect_ratio` is the ratio between length and
+                  height (or height and length) of anything that can
+                  be considered to be a cluster of buildings.  The
+                  goal is to distinguish between rows of buildings and
+                  (say) a single building.
+                - `min_area` is the minimum area of anything that can
+                  be considered to be a cluster of buildings.  The
+                  goal is to distinguish between buildings and
+                  artifacts.
+                - `element_width_factor` is the width of the
+                  structural element used to break building clusters
+                  as a fraction of the width of the cluster.
+                - `element_thickness` is the thickness of the
+                  structural element that is used to break building
+                  clusters.
+        """
+        msg = super().to_proto()
+        if self.uri:
+            msg.instance_segmentation_raster_store.uri = self.uri
+        if self.vector_output:
+            ar = []
+            for vo in self.vector_output:
+                vo_msg = VectorOutput()
+                vo_msg.denoise = vo['denoise'] if 'denoise' in vo.keys() else 0
+                vo_msg.uri = vo['uri'] if 'uri' in vo.keys() else ''
+                vo_msg.mode = vo['mode']
+                vo_msg.class_id = vo['class_id']
+                if 'building_options' in vo.keys():
+                    options = vo['building_options']
+                else:
+                    options = {}
+                bldg_msg = vo_msg.building_options
+                if 'min_aspect_ratio' in options.keys():
+                    bldg_msg.min_aspect_ratio = options['min_aspect_ratio']
+                if 'min_area' in options.keys() and options['min_area']:
+                    bldg_msg.min_area = options['min_area']
+                if 'element_width_factor' in options.keys():
+                    bldg_msg.element_width_factor = options[
+                        'element_width_factor']
+                if 'element_thickness' in options.keys():
+                    bldg_msg.element_thickness = options['element_thickness']
+                ar.append(vo_msg)
+            msg.instance_segmentation_raster_store.vector_output.extend(ar)
+        msg.instance_segmentation_raster_store.rgb = self.rgb
+        return msg
 
     def for_prediction(self, label_uri):
         return self.to_builder() \
@@ -158,6 +158,7 @@ class InstanceSegmentationRasterStoreConfigBuilder(LabelStoreConfigBuilder):
         self.valid_modes = set(['buildings', 'polygons'])
 
     def from_proto(self, msg):
+        # TODO: do we need to change the raster store class?
         uri = msg.instance_segmentation_raster_store.uri
         rgb = msg.instance_segmentation_raster_store.rgb
         vo_msg = msg.instance_segmentation_raster_store.vector_output
