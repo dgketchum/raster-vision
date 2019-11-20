@@ -11,7 +11,7 @@ from rastervision.data.raster_source import RasterSource
 
 
 class InstanceSegmentationLabelSource(ActivateMixin, LabelSource):
-    """A read-only label source for semantic segmentation."""
+    """A read-only label source for instance segmentation."""
 
     def __init__(self, source: RasterSource, rgb_class_map: ClassMap = None):
         """Constructor.
