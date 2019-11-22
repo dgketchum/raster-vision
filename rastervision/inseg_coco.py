@@ -7,6 +7,7 @@ from numpy import zeros
 from PIL.ImageColor import colormap
 # from pycocotools.coco import COCO
 
+
 import rastervision as rv
 
 if 'home' in os.getcwd():

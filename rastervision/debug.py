@@ -36,7 +36,7 @@ model_urls = {
         'https://download.pytorch.org/models/maskrcnn_resnet50_fpn_coco-bf2d0c1e.pth',
 }
 
-dir_ = '/home/dgketchum/field_extraction/training_data/example/WA/image_train'
+dir_ = '/home/dgketchum/field_extraction/training_data/example/COCO/image_train'
 out_dir_ = '/home/dgketchum/field_extraction/training_data/example/COCO/pred'
 
 images = [os.path.join(dir_, x) for x in os.listdir(dir_)]
