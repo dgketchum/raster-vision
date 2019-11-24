@@ -1,5 +1,6 @@
 from torchvision.models.detection import maskrcnn_resnet50_fpn
 from torchvision.models.detection.mask_rcnn import MaskRCNN
+from torchvision.models.detection import FastRCNNPredictor
 from torchvision.models.utils import load_state_dict_from_url
 
 
@@ -9,12 +10,17 @@ def get_model(num_classes=91, pretrained=True):
         assert num_classes == 91
         model = maskrcnn_resnet50_fpn(pretrained=True)
 
-    else:
+    elif num_classes != 91:
         # TODO: specify user options for hyper-parameters
-        backbone = maskrcnn_resnet50_fpn(pretrained=False).backbone
-        model = MaskRCNN(backbone, num_classes,
-                         image_mean=(0.485, 0.456, 0.406), image_std=(0.229, 0.224, 0.225),
-                         rpn_pre_nms_top_n_test=15, rpn_nms_thresh=0.5, box_score_thresh=0.5,
-                         box_nms_thresh=0.5)
+        model = maskrcnn_resnet50_fpn(pretrained=True)
+        in_features = model.roi_heads.box_predictor.cls_score.in_features
+        model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
+        in_features_mask = model.roi_heads.mask_predictor.conv5_mask.in_channels
+        hidden_layer = 256
+        model.roi_heads.mask_predictor = MaskRCNNPredictor(in_features_mask,
+                                                           hidden_layer,
+                                                           num_classes)
+    else:
+        raise NotImplementedError
 
     return model
