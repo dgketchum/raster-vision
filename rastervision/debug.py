@@ -13,22 +13,12 @@ from torchvision.transforms import ToTensor
 from viz import display_instances
 
 model_urls = {'maskrcnn_resnet50_fpn_coco':
-                  'https://download.pytorch.org/models/maskrcnn_resnet50_fpn_coco-bf2d0c1e.pth'}
+              'https://download.pytorch.org/models/maskrcnn_resnet50_fpn_coco-bf2d0c1e.pth'}
 
 dir_ = '/home/dgketchum/field_extraction/training_data/example/COCO/image_train'
 out_dir_ = '/home/dgketchum/field_extraction/training_data/example/COCO/pred'
 images = [os.path.join(dir_, x) for x in os.listdir(dir_)]
 shuffle(images)
-
-
-def load_dataset():
-    training_dataset = ImageFolder(root=dir_, transform=ToTensor())
-    train_loader = DataLoader(
-        training_dataset,
-        batch_size=6,
-        num_workers=0,
-        shuffle=True)
-    return train_loader
 
 
 def get_model():
