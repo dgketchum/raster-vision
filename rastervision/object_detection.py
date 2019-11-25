@@ -5,7 +5,7 @@ import rastervision as rv
 if 'home' in os.getcwd():
     home = os.path.expanduser('~')
     ROOT_URI = os.path.join(home, 'field_extraction', 'training_data')
-    PROCESSED_URI = os.path.join(ROOT_URI, 'example')
+    PROCESSED_URI = os.path.join(ROOT_URI, 'example', 'COCO')
     TMP = os.environ['TMPDIR'] = os.path.join(ROOT_URI, 'tmp')
     os.environ['TORCH_HOME'] = os.path.join(home, 'field_extraction', 'torche-cache')
     os.environ['GDAL_DATA'] = os.path.join(home,
@@ -93,11 +93,11 @@ def get_scene_info(_type='train'):
 
 
 if __name__ == '__main__':
-    # i = CowcObjectDetectionExperiments().exp_main(test=True)
-    # rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
+    i = CowcObjectDetectionExperiments().exp_main(test=True)
+    rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
     # rv.main()
 
-    cmd = '/home/dgketchum/field_extraction/training_data/train/washington-object-detection-test/command-config-0.json'
-    rv.runner.CommandRunner.run(cmd)
+    # cmd = '/home/dgketchum/field_extraction/training_data/train/washington-object-detection-test/command-config-0.json'
+    # rv.runner.CommandRunner.run(cmd)
 
 # ========================= EOF ====================================================================
