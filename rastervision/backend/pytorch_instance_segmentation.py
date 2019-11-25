@@ -232,8 +232,7 @@ class PyTorchInstanceSegmentation(Backend):
 
         # Setup model
         num_labels = len(databunch.label_names)
-        model = get_model(
-            self.train_opts.model_arch, num_labels, pretrained=False)
+        model = get_model(num_labels, pretrained=False)
         model = model.to(self.device)
         model_path = join(train_dir, 'model')
 
@@ -310,7 +309,7 @@ class PyTorchInstanceSegmentation(Backend):
 
             if epoch_scheduler:
                 epoch_scheduler.step()
-            log.info('train loss: {}'.format(train_loss['total_loss']))
+            log.info('train loss: {}'.format(train_loss))
 
             # Validate one epoch.
             metrics = validate_epoch(model, self.device, databunch.valid_dl,
@@ -338,7 +337,7 @@ class PyTorchInstanceSegmentation(Backend):
             if self.train_opts.log_tensorboard:
                 for key, val in metrics.items():
                     tb_writer.add_scalar(key, val, epoch)
-                tb_writer.add_scalar('train_loss', train_loss['total_loss'], epoch)
+                tb_writer.add_scalar('train_loss', train_loss, epoch)
                 for name, param in model.named_parameters():
                     tb_writer.add_histogram(name, param, epoch)
 
@@ -366,8 +365,7 @@ class PyTorchInstanceSegmentation(Backend):
             model_path = download_if_needed(model_uri, tmp_dir)
 
             num_classes = len(self.class_map)
-            model = get_model(
-                self.train_opts.model_arch, num_classes, pretrained=True)
+            model = get_model(num_classes)
             model = model.to(self.device)
             model.load_state_dict(
                 torch.load(model_path, map_location=self.device))
