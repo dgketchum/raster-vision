@@ -12,8 +12,8 @@ import rastervision as rv
 
 if 'home' in os.getcwd():
     home = os.path.expanduser('~')
-    ROOT_URI = os.path.join(home, 'field_extraction', 'training_data')
-    PROCESSED_URI = os.path.join(ROOT_URI, 'example', 'COCO')
+    ROOT_URI = os.path.join(home, 'field_extraction', 'COCO')
+    PROCESSED_URI = os.path.join(ROOT_URI, 'data')
     TMP = os.environ['TMPDIR'] = os.path.join(ROOT_URI, 'tmp')
     os.environ['TORCH_HOME'] = os.path.join(home, 'field_extraction', 'torch-cache')
     os.environ['GDAL_DATA'] = os.path.join(home,
@@ -22,7 +22,7 @@ else:
     ROOT_URI = '/opt/data/training_data'
     PROCESSED_URI = os.path.join(ROOT_URI, 'example', 'COCO')
 
-COCO_INSTANCE_CATEGORY_NAMES = [str(x) for x in range(91)]
+COCO_INSTANCE_CATEGORY_NAMES = [str(x) for x in range(1, 91)]
 colors = [k for k in colormap.keys()]
 
 MODEL_URI = 'https://download.pytorch.org/models/maskrcnn_resnet50_fpn_coco-bf2d0c1e.pth',
@@ -39,26 +39,26 @@ def get_images(t):
 class InstanceSegmentationExperiments(rv.ExperimentSet):
     def exp_main(self):
 
-        try:
-            train_scene_info = get_images('train')
-            val_scene_info = get_images('val')
-            test_scene_info = get_images('test')
+        # try:
+        train_scene_info = get_images('train')
+        val_scene_info = get_images('val')
+        test_scene_info = get_images('test')
 
-        except:
-            train_scene_info = get_scene_info('train')
-            val_scene_info = get_scene_info('val')
-            test_scene_info = get_scene_info('test')
+        # except:
+        #     train_scene_info = get_scene_info('train')
+        #     val_scene_info = get_scene_info('val')
+        #     test_scene_info = get_scene_info('test')
 
         exp_id = 'coco-inseg'
-        classes = {k: (v, colors[v]) for (v, k) in enumerate(COCO_INSTANCE_CATEGORY_NAMES)}
+        classes = {k: (v, colors[v]) for (v, k) in enumerate(COCO_INSTANCE_CATEGORY_NAMES, start=1)}
 
         debug = True
-        num_epochs = 1
+        num_epochs = 10
         batch_size = 5
 
         task = rv.TaskConfig.builder(rv.INSTANCE_SEGMENTATION) \
             .with_chip_size(300) \
-            .with_chip_options(chips_per_scene=50,
+            .with_chip_options(chips_per_scene=10,
                                window_method='sliding',
                                debug_chip_probability=1.0) \
             .with_classes(classes) \
@@ -69,7 +69,7 @@ class InstanceSegmentationExperiments(rv.ExperimentSet):
             .with_pretrained_uri(MODEL_URI)\
             .with_train_options(
             batch_size=batch_size,
-            lr=1e-4,
+            lr=0.0025,
             num_epochs=num_epochs,
             model_arch='resnet50',
             debug=debug) \
@@ -126,15 +126,13 @@ def make_scene(raster, label, task, mode):
 
 def get_scene_info(type_='train'):
 
-    print(type_)
-
     img_dir = os.path.join(PROCESSED_URI, 'image_{}'.format(type_))
     label_dir = os.path.join(PROCESSED_URI, 'label_{}'.format(type_))
     pred_dir = os.path.join(PROCESSED_URI, 'pred_{}'.format(type_))
 
     meta = collate_annotations(img_dir)
 
-    coco = COCO('/home/dgketchum/Downloads/annotations/instances_val2017.json')
+    coco = COCO('/home/dgketchum/field_extraction/COCO/data/annotations/instances_val2017.json')
 
     images = []
 
@@ -176,7 +174,7 @@ def get_scene_info(type_='train'):
 
 def collate_annotations(img_dir_train):
 
-    f = open('/home/dgketchum/Downloads/annotations/instances_val2017.json', 'r')
+    f = open('/home/dgketchum/field_extraction/COCO/data/annotations/instances_val2017_collated.json', 'r')
     j = json.load(f)
     f.close()
 
@@ -200,10 +198,7 @@ if __name__ == '__main__':
     # i = InstanceSegmentationExperiments().exp_main()
     # rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
 
-    # cmd = '/home/dgketchum/field_extraction/training_data/train/coco-inseg/command-config-0.json'
-    # rv.runner.CommandRunner.run(cmd)
-
-    cmd = '/home/dgketchum/field_extraction/training_data/predict/coco-inseg/command-config-0.json'
+    cmd = '/home/dgketchum/field_extraction/COCO/chip/coco-inseg/command-config-0.json'
     rv.runner.CommandRunner.run(cmd)
 
 # ====================================== EOF =================================================================
