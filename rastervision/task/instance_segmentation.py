@@ -120,22 +120,16 @@ class InstanceSegmentation(Task):
                     chip = scene.raster_source.get_chip(window)
                     labels = self.get_train_labels(window, scene)
 
+                    # TODO: ask lewfish how to differentiate between background and no-data
+                    # TODO: no masking 'ignore' label until further notice
                     # If chip has ignore labels, fill in those pixels with
                     # nodata.
+
                     label_arr = labels.get_label_arr(window)
 
-                    try:
-                        zero_inds = label_arr.sum(axis=2).ravel() == 0
-                    except np.AxisError:
-                        zero_inds = label_arr.ravel() == 0
+                    if not np.all(label_arr):
+                        data.append(chip, window, labels)
 
-                    chip_shape = chip.shape
-                    if np.any(zero_inds):
-                        chip = np.reshape(chip, (-1, chip.shape[2]))
-                        chip[zero_inds, :] = 0
-                        chip = np.reshape(chip, chip_shape)
-
-                    data.append(chip, window, labels)
                 # Shuffle data so the first N samples which are displayed in
                 # Tensorboard are more diverse.
                 data.shuffle()
