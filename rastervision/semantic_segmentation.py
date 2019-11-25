@@ -5,7 +5,7 @@ import rastervision as rv
 if 'home' in os.getcwd():
     home = os.path.expanduser('~')
     ROOT_URI = os.path.join(home, 'field_extraction', 'training_data')
-    PROCESSED_URI = os.path.join(ROOT_URI, 'example')
+    PROCESSED_URI = os.path.join(ROOT_URI, 'example', 'WA')
     TMP = os.environ['TMPDIR'] = os.path.join(ROOT_URI, 'tmp')
     os.environ['TORCH_HOME'] = os.path.join(home, 'field_extraction', 'torche-cache')
     os.environ['GDAL_DATA'] = os.path.join(home,
@@ -22,7 +22,7 @@ class SemanticSegmentationExperiments(rv.ExperimentSet):
         val_scene_info = get_scene_info('val')
 
         exp_id = 'washington-semseg-test'
-        classes = {'field': (1, 'green'), 'background': (0, 'white')}
+        classes = {'field': (1, 'green'), 'background': (2, 'white')}
 
         if test:
             train_scene_info = train_scene_info[0:1]
@@ -96,5 +96,5 @@ if __name__ == '__main__':
     # i = SemanticSegmentationExperiments().exp_main()
     # rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
     # rv.main()
-    cmd = '/home/dgketchum/field_extraction/training_data/train/washington-semseg-test/command-config-0.json'
+    cmd = '/home/dgketchum/field_extraction/training_data/chip/washington-semseg-test/command-config-0.json'
     rv.runner.CommandRunner.run(cmd)
