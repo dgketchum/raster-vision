@@ -30,45 +30,45 @@ class InstanceSegmentationDataset(Dataset):
         features = features[1:]
         masks = mask == features[:, None, None]
 
-        max_features = 15
         nb_features = len(features)
+        # TODO: find a way to prevent zero-(area, features) in chip processing
+        if nb_features == 0:
+            return False
 
         boxes = []
-        for i in range(max_features):
-            if i < nb_features:
-                pos = np.where(masks[i])
-                xmin = np.min(pos[1])
-                xmax = np.max(pos[1])
-                ymin = np.min(pos[0])
-                ymax = np.max(pos[0])
-                boxes.append([xmin, ymin, xmax, ymax])
-            else:
-                boxes.append([0, 0, 0, 0])
+        for i in range(nb_features):
+            pos = np.where(masks[i])
+            xmin = np.min(pos[1])
+            xmax = np.max(pos[1])
+            ymin = np.min(pos[0])
+            ymax = np.max(pos[0])
+            boxes.append([xmin, ymin, xmax, ymax])
+
         boxes = as_tensor(boxes, dtype=float32)
-
-        # the following is a hack to generate labels and masks of consistent shape,
-        # regardless of the number of features in the training data
-        # this is probably not a real problem
-        # TODO need to loop over nb_classes, nb_features
-
-        nb_empty = max_features - nb_features
-
+        area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
         labels = ones((nb_features,), dtype=int64)
-        null_labels = zeros((nb_empty,), dtype=int64)
-        labels = cat([labels, null_labels])
-
         masks = as_tensor(masks, dtype=int64)
-        null_masks = zeros((nb_empty, mask.shape[0], mask.shape[1]), dtype=int64)
-        masks = cat([masks, null_masks])
+
+        try:
+            keep = (boxes[:, 3] > boxes[:, 1]) & (boxes[:, 2] > boxes[:, 0])
+            boxes = boxes[keep]
+            labels = labels[keep]
+            masks = masks[keep]
+            area = area[keep]
+
+        except IndexError:
+            pass
 
         # consider reinstating id_
-        # consider reinstating area
         # consider reinstating iscrowd
 
         if self.transforms is not None:
             x = self.transforms(img)
+        # TODO: find a way to prevent zero-(area, features) in chip processing
+        if area.sum() < 1.0:
+            return False
 
-        target = {'boxes': boxes, 'labels': labels, 'masks': masks}
+        target = {'boxes': boxes, 'labels': labels, 'masks': masks, 'area': area, 'path': img_path}
 
         return x, target
 
@@ -101,9 +101,9 @@ def build_databunch(data_dir, img_sz, batch_sz, class_names):
 
     train_dl = DataLoader(
         train_ds,
-        shuffle=True,
+        shuffle=False,
         batch_size=batch_sz,
-        num_workers=num_workers,
+        num_workers=0,
         drop_last=True,
         pin_memory=True,
         collate_fn=collate_fn)
@@ -118,6 +118,8 @@ def build_databunch(data_dir, img_sz, batch_sz, class_names):
 
 
 def collate_fn(data):
-    x = [d[0] for d in data]
-    y = [d[1] for d in data]
+    x, y = [], []
+    for d in data:
+        if d:
+            x.append(d[0]), y.append(d[1])
     return x, y
