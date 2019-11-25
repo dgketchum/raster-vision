@@ -4,8 +4,8 @@ import rastervision as rv
 
 if 'home' in os.getcwd():
     home = os.path.expanduser('~')
-    ROOT_URI = os.path.join(home, 'field_extraction', 'training_data')
-    PROCESSED_URI = os.path.join(ROOT_URI, 'example')
+    ROOT_URI = os.path.join(home, 'field_extraction', 'WA')
+    PROCESSED_URI = os.path.join(ROOT_URI, 'data')
     TMP = os.environ['TMPDIR'] = os.path.join(ROOT_URI, 'tmp')
     os.environ['TORCH_HOME'] = os.path.join(home, 'field_extraction', 'torch-cache')
     os.environ['GDAL_DATA'] = os.path.join(home,
@@ -18,19 +18,23 @@ else:
 class InstanceSegmentationExperiments(rv.ExperimentSet):
     def exp_main(self):
 
-        train_scene_info = get_scene_info('train')
-        val_scene_info = get_scene_info('val')
+        train_scene_info = get_scene_info('train')[:2]
+        val_scene_info = get_scene_info('val')[:2]
 
-        exp_id = 'washington-inseg'
-        classes = {'field': (1, 'green'), 'background': (0, 'white')}
+        exp_id = 'washington-inseg-24NOV'
+        classes = {'field': (1, 'red'), 'background': (2, 'green')}
 
         debug = True
         num_epochs = 100
-        batch_size = 8
+        batch_size = 2
 
         task = rv.TaskConfig.builder(rv.INSTANCE_SEGMENTATION) \
             .with_chip_size(300) \
-            .with_chip_options(chips_per_scene=50) \
+            .with_chip_options(window_method='sliding',
+                               target_classes=[1],
+                               debug_chip_probability=0.25,
+                               negative_survival_probability=1.0,
+                               stride=100) \
             .with_classes(classes) \
             .build()
 
@@ -38,7 +42,7 @@ class InstanceSegmentationExperiments(rv.ExperimentSet):
             .with_task(task) \
             .with_train_options(
             batch_size=batch_size,
-            lr=1e-4,
+            lr=0.0001,
             num_epochs=num_epochs,
             model_arch='resnet50',
             debug=debug) \
@@ -93,17 +97,11 @@ def get_scene_info(_type='train'):
 
 
 if __name__ == '__main__':
-    # i = InstanceSegmentationExperiments().exp_main(test=False)
+    # i = InstanceSegmentationExperiments().exp_main()
     # rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
     # rv.main()
 
-    # cmd = '/home/dgketchum/field_extraction/training_data/analyze/washington-inseg/command-config-0.json'
-    # rv.runner.CommandRunner.run(cmd)
-    #
-    # cmd = '/home/dgketchum/field_extraction/training_data/chip/washington-inseg/command-config-0.json'
-    # rv.runner.CommandRunner.run(cmd)
-    #
-    cmd = '/home/dgketchum/field_extraction/training_data/train/washington-inseg/command-config-0.json'
+    cmd = '/home/dgketchum/field_extraction/WA/train/washington-inseg-24NOV/command-config-0.json'
     rv.runner.CommandRunner.run(cmd)
 
 # ====================================== EOF =================================================================
