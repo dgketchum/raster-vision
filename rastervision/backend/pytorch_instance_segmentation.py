@@ -312,9 +312,10 @@ class PyTorchInstanceSegmentation(Backend):
             log.info('train loss: {}'.format(train_loss))
 
             # Validate one epoch.
-            metrics = validate_epoch(model, self.device, databunch.valid_dl,
-                                     num_labels)
-            log.info('validation metrics: {}'.format(metrics))
+            # TODO: reinstate validation once training learns on new data
+            # metrics = validate_epoch(model, self.device, databunch.valid_dl,
+            #                          num_labels)
+            # log.info('validation metrics: {}'.format(metrics))
 
             # Print elapsed time for epoch.
             end = time.time()
@@ -327,19 +328,19 @@ class PyTorchInstanceSegmentation(Backend):
             json_to_file(train_state, train_state_path)
 
             # Append to log CSV file.
-            with open(log_path, 'a') as log_file:
-                log_writer = csv.writer(log_file)
-                row = [epoch, epoch_time, train_loss]
-                row += [metrics[k] for k in metric_names]
-                log_writer.writerow(row)
+            # with open(log_path, 'a') as log_file:
+            #     log_writer = csv.writer(log_file)
+            #     row = [epoch, epoch_time, train_loss]
+            #     row += [metrics[k] for k in metric_names]
+            #     log_writer.writerow(row)
 
             # Write to Tensorboard log.
-            if self.train_opts.log_tensorboard:
-                for key, val in metrics.items():
-                    tb_writer.add_scalar(key, val, epoch)
-                tb_writer.add_scalar('train_loss', train_loss, epoch)
-                for name, param in model.named_parameters():
-                    tb_writer.add_histogram(name, param, epoch)
+            # if self.train_opts.log_tensorboard:
+            #     for key, val in metrics.items():
+            #         tb_writer.add_scalar(key, val, epoch)
+            #     tb_writer.add_scalar('train_loss', train_loss, epoch)
+            #     for name, param in model.named_parameters():
+            #         tb_writer.add_histogram(name, param, epoch)
 
             if (train_uri.startswith('s3://')
                     and (((epoch + 1) % self.train_opts.sync_interval) == 0)):

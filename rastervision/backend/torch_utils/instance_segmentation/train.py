@@ -37,16 +37,18 @@ def train_epoch(model, device, data_loader, opt, loss_fn, step_scheduler=None):
 
 
 def validate_epoch(model, device, data_loader, num_labels):
-    model.eval()
-
-    conf_mat = torch.zeros((num_labels, num_labels))
-    with torch.no_grad():
-        with click.progressbar(data_loader, label='Validating') as bar:
-            for batch_ind, (x, target) in enumerate(bar):
-                pass
+    # TODO: build validation once training learns on new data
+    # model.eval()
+    #
+    # conf_mat = torch.zeros((num_labels, num_labels))
+    # with torch.no_grad():
+    #     with click.progressbar(data_loader, label='Validating') as bar:
+    #         for batch_ind, (x, target) in enumerate(bar):
+    #             pass
                 # x = [_.to(device) for _ in x]
                 # out = model(x)
 
     # Ignore index zero.
-    conf_mat = conf_mat[1:, 1:]
-    return compute_conf_mat_metrics(conf_mat)
+    # conf_mat = conf_mat[1:, 1:]
+    # return compute_conf_mat_metrics(conf_mat)
+    pass
