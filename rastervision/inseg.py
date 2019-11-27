@@ -8,8 +8,8 @@ if 'home' in os.getcwd():
     PROCESSED_URI = os.path.join(ROOT_URI, 'data')
     TMP = os.environ['TMPDIR'] = os.path.join(ROOT_URI, 'tmp')
     os.environ['TORCH_HOME'] = os.path.join(home, 'field_extraction', 'torch-cache')
-    os.environ['GDAL_DATA'] = os.path.join(home,
-                                           'miniconda2/envs/vision/lib/python3.7/site-packages/rasterio/gdal_data')
+    os.environ['GDAL_DATA'] = os.path.join(home, 'miniconda2/envs/vision/lib/python3.7',
+                                           'site-packages/rasterio/gdal_data')
 else:
     ROOT_URI = '/opt/data/training_data'
     PROCESSED_URI = os.path.join(ROOT_URI, 'example')
@@ -17,16 +17,15 @@ else:
 
 class InstanceSegmentationExperiments(rv.ExperimentSet):
     def exp_main(self):
+        train_scene_info = get_scene_info('train')
+        val_scene_info = get_scene_info('val')
 
-        train_scene_info = get_scene_info('train')[:2]
-        val_scene_info = get_scene_info('val')[:2]
-
-        exp_id = 'washington-inseg-24NOV'
+        exp_id = 'washington-inseg'
         classes = {'field': (1, 'red'), 'background': (2, 'green')}
 
         debug = True
-        num_epochs = 100
-        batch_size = 2
+        num_epochs = 40
+        batch_size = 7
 
         task = rv.TaskConfig.builder(rv.INSTANCE_SEGMENTATION) \
             .with_chip_size(300) \
@@ -42,14 +41,14 @@ class InstanceSegmentationExperiments(rv.ExperimentSet):
             .with_task(task) \
             .with_train_options(
             batch_size=batch_size,
-            lr=0.0001,
+            lr=0.0025,
             num_epochs=num_epochs,
             model_arch='resnet50',
             debug=debug) \
             .build()
 
-        train_scenes = [make_scene(x, y, task) for x, y in train_scene_info]
-        val_scenes = [make_scene(x, y, task) for x, y in val_scene_info]
+        train_scenes = [make_scene(raster=x, label=y, task=task, mode='train') for x, y in train_scene_info]
+        val_scenes = [make_scene(raster=x, label=y, task=task, mode='val') for x, y in val_scene_info]
 
         dataset = rv.DatasetConfig.builder() \
             .with_train_scenes(train_scenes) \
@@ -68,22 +67,28 @@ class InstanceSegmentationExperiments(rv.ExperimentSet):
         return experiment
 
 
-def make_scene(raster_uri, label_uri, task):
-
-    _id = os.path.splitext(os.path.basename(raster_uri))[0]
+def make_scene(raster, label, task, mode):
+    _id = os.path.splitext(os.path.basename(raster))[0]
 
     label_raster_source = rv.RasterSourceConfig.builder(rv.RASTERIO_SOURCE) \
-        .with_uri(label_uri)\
+        .with_uri(label) \
         .build()
 
     label_source = rv.LabelSourceConfig.builder(rv.INSTANCE_SEGMENTATION) \
         .with_raster_source(label_raster_source) \
         .build()
 
+    uri = label.replace('label_{}'.format(mode), 'pred')
+    label_store = rv.LabelStoreConfig.builder(rv.INSTANCE_SEGMENTATION_RASTER) \
+        .with_uri(uri) \
+        .with_rgb(True) \
+        .build()
+
     return rv.SceneConfig.builder() \
         .with_task(task) \
         .with_id(_id) \
-        .with_raster_source(raster_uri, channel_order=[0, 1, 2]) \
+        .with_raster_source(raster, channel_order=[0, 1, 2]) \
+        .with_label_store(label_store) \
         .with_label_source(label_source) \
         .build()
 
@@ -101,7 +106,7 @@ if __name__ == '__main__':
     # rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
     # rv.main()
 
-    cmd = '/home/dgketchum/field_extraction/WA/train/washington-inseg-24NOV/command-config-0.json'
+    cmd = '/home/dgketchum/field_extraction/WA/predict/washington-inseg/command-config-0.json'
     rv.runner.CommandRunner.run(cmd)
 
 # ====================================== EOF =================================================================
