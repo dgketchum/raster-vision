@@ -40,7 +40,9 @@ class InstanceSegmentationRasterStore(LabelStore):
         self.tmp_dir = tmp_dir
         # Note: can't name this class_transformer due to Python using that attribute
         if class_map:
-            self.class_trans = SegmentationClassTransformer(class_map)
+            self.class_trans = None
+            # TODO: why use this for instance seg?
+            # self.class_trans = SegmentationClassTransformer(class_map)
         else:
             self.class_trans = None
 
