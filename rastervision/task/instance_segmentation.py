@@ -120,7 +120,7 @@ class InstanceSegmentation(Task):
                     chip = scene.raster_source.get_chip(window)
                     labels = self.get_train_labels(window, scene)
 
-                    # TODO: ask lewfish how to differentiate between background and no-data
+                    # TODO: ask @lewfish how to differentiate between background and no-data
                     # TODO: no masking 'ignore' label until further notice
                     # If chip has ignore labels, fill in those pixels with
                     # nodata.
