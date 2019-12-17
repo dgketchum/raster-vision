@@ -1,6 +1,10 @@
 from rastervision.data.label import Labels
+from rastervision.data.label.tfod_utils.np_box_list import BoxList
+from rastervision.core.box import Box
 
+from copy import deepcopy
 import numpy as np
+from scipy.stats import mode
 from rasterio.features import rasterize
 import shapely
 
@@ -13,7 +17,7 @@ class InstanceSegmentationLabels(Labels):
     windows.
     """
 
-    def __init__(self, windows, label_fn, aoi_polygons=None):
+    def __init__(self, windows, labels, aoi_polygons=None):
         """Constructor
 
         Args:
@@ -25,23 +29,38 @@ class InstanceSegmentationLabels(Labels):
 
         """
         self.windows = windows
-        self.label_fn = label_fn
         self.aoi_polygons = aoi_polygons
+
+        if isinstance(labels, dict):
+            self.masks = labels['masks']
+            self.boxes = labels['boxes']
+            self.labels = labels['labels']
+            self.scores = labels['scores']
+
+            self.boxlist = BoxList(self.boxes)
+            self.boxlist.add_field('classes', self.labels)
+            self.boxlist.add_field('scores', self.scores)
 
     def __add__(self, other):
         """Add labels to these labels.
 
         Returns a concatenation of this and the other labels.
         """
-        return InstanceSegmentationLabels(
-            self.windows + other.windows,
-            self.label_fn,
-            aoi_polygons=self.aoi_polygons)
+
+        self.labels = np.concatenate([self.labels, other.labels], axis=0)
+        self.masks = np.concatenate([self.masks, other.masks], axis=0)
+        self.boxes = np.concatenate([self.boxes, other.boxes], axis=0)
+        self.scores = np.concatenate([self.scores, other.scores], axis=0)
+        self.boxlist = BoxList(self.boxes)
+        self.boxlist.add_field('classes', self.labels)
+        self.boxlist.add_field('scores', self.scores)
+
+        return self
 
     def __eq__(self, other):
         for window in self.get_windows():
             if not np.array_equal(
-                    self.get_label_arr(window), other.get_label_arr(window)):
+                    self.get_label_array(window), other.get_label_array(window)):
                 return False
         return True
 
@@ -56,7 +75,18 @@ class InstanceSegmentationLabels(Labels):
     def get_windows(self):
         return self.windows
 
-    def get_label_arr(self, window, clip_extent=None):
+    @staticmethod
+    def local_to_global(npboxes, window):
+        """Convert from local to global coordinates.
+
+        The local coordinates are row/col within the window frame of reference.
+        The global coordinates are row/col within the extent of a RasterSource.
+        """
+        xmin = window.xmin
+        ymin = window.ymin
+        return npboxes + np.array([[ymin, xmin, ymin, xmin]])
+
+    def get_label_array(self, window, clip_extent=None):
         """Get the label array for a window.
 
         Note: the window should be kept relatively small to avoid running out of memory.
@@ -72,7 +102,14 @@ class InstanceSegmentationLabels(Labels):
         window_geom = window.to_shapely()
 
         if not self.aoi_polygons:
-            label_arr = self.label_fn(window)
+            masks = deepcopy(self.masks)
+            masks[masks == 0] = np.nan
+
+            # TODO: collapse masks here?
+
+            for m in range(masks.shape[0]):
+                pass
+            label_arr = mode(masks, axis=0, nan_policy='omit')[0][0, 0, :, :]
         else:
             # For each aoi_polygon, intersect with window, and put in window frame of
             # reference.
@@ -108,3 +145,13 @@ class InstanceSegmentationLabels(Labels):
                                   clip_window.get_width()]
 
         return label_arr
+
+    def get_boxes(self):
+        """Return list of Boxes."""
+        return [Box.from_npbox(npbox) for npbox in self.boxlist.get()]
+
+    def get_class_ids(self):
+        return self.boxlist.get_field('classes')
+
+    def get_scores(self):
+        return self.boxlist.get_field('scores')
