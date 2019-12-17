@@ -1,15 +1,18 @@
 import numpy as np
 import rasterio
+from PIL import Image
 
 import rastervision as rv
-from rastervision.utils.files import (get_local_path, make_dir, upload_or_copy,
-                                      file_exists)
 from rastervision.data.label import InstanceSegmentationLabels
 from rastervision.data.label_store import LabelStore
-from rastervision.data.label_source import SegmentationClassTransformer
+from rastervision.data.utils import boxes_to_geojson
+from rastervision.utils.files import (get_local_path, make_dir, upload_or_copy,
+                                      file_exists)
+from rastervision.utils.files import json_to_file
+from rastervision.viz import display_instances
 
 
-class InstanceSegmentationRasterStore(LabelStore):
+class InstanceSegmentationLabelStore(LabelStore):
     """A prediction label store for instance segmentation raster files.
     """
 
@@ -18,8 +21,8 @@ class InstanceSegmentationRasterStore(LabelStore):
                  extent,
                  crs_transformer,
                  tmp_dir,
-                 vector_output=None,
-                 class_map=None):
+                 class_map,
+                 vector_output=None):
         """Constructor.
 
         Args:
@@ -84,7 +87,7 @@ class InstanceSegmentationRasterStore(LabelStore):
         windows = extent.get_windows(chip_size, chip_size)
         return InstanceSegmentationLabels(windows, label_fn)
 
-    def save(self, labels):
+    def save(self, labels, class_map):
         """Save.
 
         Args:
@@ -112,9 +115,21 @@ class InstanceSegmentationRasterStore(LabelStore):
         else:
             mask = None
 
+        boxes = labels.get_boxes()
+        class_ids = labels.get_class_ids().tolist()
+        scores = labels.get_scores().tolist()
+        geojson = boxes_to_geojson(
+            boxes,
+            class_ids,
+            self.crs_transformer,
+            class_map,
+            scores=scores)
+        json_to_file(geojson, self.uri)
+
         # https://github.com/mapbox/rasterio/blob/master/docs/quickstart.rst
         # https://rasterio.readthedocs.io/en/latest/topics/windowed-rw.html
         print(local_path)
+
         with rasterio.open(
                 local_path,
                 'w',
@@ -126,7 +141,7 @@ class InstanceSegmentationRasterStore(LabelStore):
                 transform=transform,
                 crs=crs) as dataset:
             for window in labels.get_windows():
-                class_labels = labels.get_label_arr(
+                class_labels = labels.get_label_array(
                     window, clip_extent=self.extent)
                 clipped_window = ((window.ymin,
                                    window.ymin + class_labels.shape[0]),
@@ -134,18 +149,31 @@ class InstanceSegmentationRasterStore(LabelStore):
                                    window.xmin + class_labels.shape[1]))
                 if mask is not None:
                     mask[clipped_window[0][0]:clipped_window[0][1],
-                         clipped_window[1][0]:clipped_window[1][
-                             1]] = class_labels
-                if self.class_trans:
-                    rgb_labels = self.class_trans.class_to_rgb(class_labels)
-                    for chan in range(3):
-                        dataset.write_band(
-                            chan + 1,
-                            rgb_labels[:, :, chan],
-                            window=clipped_window)
+                    clipped_window[1][0]:clipped_window[1][
+                        1]] = class_labels
+
+                # TODO: why store this as RGB? For visualization?
+                # if self.class_trans:
+                #     rgb_labels = self.class_trans.class_to_rgb(class_labels)
+                #     for chan in range(3):
+                #         dataset.write_band(
+                #             chan + 1,
+                #             rgb_labels[:, :, chan],
+                #             window=clipped_window)
+
                 else:
                     img = class_labels.astype(dtype)
                     dataset.write_band(1, img, window=clipped_window)
+
+        # TODO where to put the visualization code/write an RGB representation with instance seg labels?
+        im = np.array(Image.open(self.source.imagery_path).convert('RGB'))
+        r = rasterio.open(local_path, 'r')
+        mask = r.read()
+        class_names = [str(x) for x in class_ids]
+        display_instances(im, boxes=boxes, masks=masks,
+                          class_ids=class_ids,
+                          class_names=class_names,
+                          show_mask=True, show_bbox=True)
 
         upload_or_copy(local_path, self.uri)
 
