@@ -75,6 +75,16 @@ class Box():
         return np.array(
             [self.ymin, self.xmin, self.ymax, self.xmax], dtype=np.float)
 
+    def annotation_format(self):
+        """Return Box in COCO format.
+
+        Returns:
+            Numpy array of form [ymin, xmin, ymax, xmax] with float type
+
+        """
+        return np.array(
+            [self.xmin, self.ymin, self.xmax, self.ymax], dtype=np.float)
+
     @staticmethod
     def to_npboxes(boxes):
         """Return nx4 numpy array from list of Box."""
@@ -82,6 +92,15 @@ class Box():
         npboxes = np.empty((nb_boxes, 4))
         for boxind, box in enumerate(boxes):
             npboxes[boxind, :] = box.npbox_format()
+        return npboxes
+
+    @staticmethod
+    def to_anotboxes(boxes):
+        """Return nx4 numpy array from list of Box in COCO Annotation format."""
+        nb_boxes = len(boxes)
+        npboxes = np.empty((nb_boxes, 4))
+        for boxind, box in enumerate(boxes):
+            npboxes[boxind, :] = box.annotation_format()
         return npboxes
 
     def __str__(self):  # pragma: no cover
