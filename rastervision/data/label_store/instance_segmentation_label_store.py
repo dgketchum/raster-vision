@@ -46,9 +46,7 @@ class InstanceSegmentationLabelStore(LabelStore):
         self.tmp_dir = tmp_dir
         # Note: can't name this class_transformer due to Python using that attribute
         if class_map:
-            self.class_trans = None
-            # TODO: why use this for instance seg?
-            # self.class_trans = SegmentationClassTransformer(class_map)
+            self.class_trans = SegmentationClassTransformer(class_map)
         else:
             self.class_trans = None
 
@@ -155,39 +153,31 @@ class InstanceSegmentationLabelStore(LabelStore):
                     clipped_window[1][0]:clipped_window[1][
                         1]] = class_labels
 
-                # TODO: why store this as RGB? For visualization?
-                # if self.class_trans:
-                #     rgb_labels = self.class_trans.class_to_rgb(class_labels)
-                #     for chan in range(3):
-                #         dataset.write_band(
-                #             chan + 1,
-                #             rgb_labels[:, :, chan],
-                #             window=clipped_window)
+                if self.class_trans:
+                    # TODO where to put the visualization code/write an RGB representation with instance seg labels?
+                    val = local_path.replace('pred', 'image_val')
+                    jpg = val.replace('.tif', '.jpg')
+                    png = local_path.replace('.tif', '.png')
+
+                    if os.path.exists(jpg):
+                        im = np.array(Image.open(jpg).convert('RGB'))
+                    else:
+                        im = rasterio.open(val).read([1, 2, 3])
+                        im = np.moveaxis(im, 0, -1)
+
+                    class_names = {x: str(x) for x in class_ids}
+                    boxes = Box.to_anotboxes(boxes)
+                    class_ids = np.array(class_ids)
+                    masks = np.moveaxis(img, 0, -1)
+                    display_instances(im, boxes=boxes, masks=masks,
+                                      class_ids=class_ids,
+                                      class_names=class_names,
+                                      show_mask=True, show_bbox=True, save_fig=png)
 
                 else:
                     img = class_labels.astype(dtype)
                     # TODO replace 'clipped_window' arg to handle n class masks
                     dataset.write(img)
-
-        # TODO where to put the visualization code/write an RGB representation with instance seg labels?
-        val = local_path.replace('pred', 'image_val')
-        jpg = val.replace('.tif', '.jpg')
-        png = local_path.replace('.tif', '.png')
-
-        if os.path.exists(jpg):
-            im = np.array(Image.open(jpg).convert('RGB'))
-        else:
-            im = rasterio.open(val).read([1, 2, 3])
-            im = np.moveaxis(im, 0, -1)
-
-        class_names = {x: str(x) for x in class_ids}
-        boxes = Box.to_anotboxes(boxes)
-        class_ids = np.array(class_ids)
-        masks = np.moveaxis(img, 0, -1)
-        display_instances(im, boxes=boxes, masks=masks,
-                          class_ids=class_ids,
-                          class_names=class_names,
-                          show_mask=True, show_bbox=True, save_fig=png)
 
         upload_or_copy(local_path, self.uri)
 
