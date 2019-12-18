@@ -1,8 +1,11 @@
+import os
+
 import numpy as np
 import rasterio
 from PIL import Image
 
 import rastervision as rv
+from rastervision.core.box import Box
 from rastervision.data.label import InstanceSegmentationLabels
 from rastervision.data.label_store import LabelStore
 from rastervision.data.utils import boxes_to_geojson
@@ -99,7 +102,6 @@ class InstanceSegmentationLabelStore(LabelStore):
         transform = self.crs_transformer.get_affine_transform()
         crs = self.crs_transformer.get_image_crs()
 
-        band_count = 1
         dtype = np.uint8
         if self.class_trans:
             band_count = 3
@@ -116,6 +118,7 @@ class InstanceSegmentationLabelStore(LabelStore):
             mask = None
 
         boxes = labels.get_boxes()
+        band_count = len(boxes)
         class_ids = labels.get_class_ids().tolist()
         scores = labels.get_scores().tolist()
         geojson = boxes_to_geojson(
@@ -163,17 +166,28 @@ class InstanceSegmentationLabelStore(LabelStore):
 
                 else:
                     img = class_labels.astype(dtype)
-                    dataset.write_band(1, img, window=clipped_window)
+                    # TODO replace 'clipped_window' arg to handle n class masks
+                    dataset.write(img)
 
         # TODO where to put the visualization code/write an RGB representation with instance seg labels?
-        im = np.array(Image.open(self.source.imagery_path).convert('RGB'))
-        r = rasterio.open(local_path, 'r')
-        mask = r.read()
-        class_names = [str(x) for x in class_ids]
+        val = local_path.replace('pred', 'image_val')
+        jpg = val.replace('.tif', '.jpg')
+        png = local_path.replace('.tif', '.png')
+
+        if os.path.exists(jpg):
+            im = np.array(Image.open(jpg).convert('RGB'))
+        else:
+            im = rasterio.open(val).read([1, 2, 3])
+            im = np.moveaxis(im, 0, -1)
+
+        class_names = {x: str(x) for x in class_ids}
+        boxes = Box.to_anotboxes(boxes)
+        class_ids = np.array(class_ids)
+        masks = np.moveaxis(img, 0, -1)
         display_instances(im, boxes=boxes, masks=masks,
                           class_ids=class_ids,
                           class_names=class_names,
-                          show_mask=True, show_bbox=True)
+                          show_mask=True, show_bbox=True, save_fig=png)
 
         upload_or_copy(local_path, self.uri)
 
