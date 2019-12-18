@@ -152,7 +152,7 @@ class Task(object):
                 try:
                     labels = self.predict_scene(scene, tmp_dir)
                     label_store = scene.prediction_label_store
-                    label_store.save(labels)
+                    label_store.save(labels, self.backend.class_map)
                 except RuntimeError:
                     print('failed on label store uri {}'.format(scene.prediction_label_store.uri))
 
