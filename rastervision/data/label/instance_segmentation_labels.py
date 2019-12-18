@@ -102,14 +102,7 @@ class InstanceSegmentationLabels(Labels):
         window_geom = window.to_shapely()
 
         if not self.aoi_polygons:
-            masks = deepcopy(self.masks)
-            masks[masks == 0] = np.nan
-
-            # TODO: collapse masks here?
-
-            for m in range(masks.shape[0]):
-                pass
-            label_arr = mode(masks, axis=0, nan_policy='omit')[0][0, 0, :, :]
+            label_arr = np.rint(self.masks)[:, 0, :, :]
         else:
             # For each aoi_polygon, intersect with window, and put in window frame of
             # reference.
