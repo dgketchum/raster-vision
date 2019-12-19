@@ -3,10 +3,10 @@ from os.path import join, basename
 
 import numpy as np
 from PIL import Image
-from torch import as_tensor, float32, int64, ones, zeros, cat
+from torch import as_tensor, float32, int64, ones, zeros
 from torch.utils.data import DataLoader, Dataset
 from torchvision.transforms import Compose, ToTensor, Normalize
-from torchvision.transforms import Resize, CenterCrop, RandomResizedCrop, RandomHorizontalFlip
+from torchvision.transforms import RandomResizedCrop, RandomHorizontalFlip
 
 from rastervision.backend.torch_utils.data import DataBunch
 
@@ -31,9 +31,10 @@ class InstanceSegmentationDataset(Dataset):
         masks = mask == features[:, None, None]
 
         nb_features = len(features)
-        # TODO: find a way to prevent zero-(area, features) in chip processing
+
         if nb_features == 0:
-            return False
+            x, target = self.make_background_feature(img, img_path)
+            return x, target
 
         boxes = []
         for i in range(nb_features):
@@ -64,20 +65,29 @@ class InstanceSegmentationDataset(Dataset):
 
         if self.transforms is not None:
             x = self.transforms(img)
-        # TODO: find a way to prevent zero-(area, features) in chip processing
+
         if area.sum() < 1.0:
-            return False
+            x, target = self.make_background_feature(img, img_path)
+            return x, target
 
         target = {'boxes': boxes, 'labels': labels, 'masks': masks, 'area': area, 'path': img_path}
-
         return x, target
 
     def __len__(self):
         return len(self.img_paths)
 
+    def make_background_feature(self, img, path):
+        area = as_tensor([img.size[0] * img.size[1]], dtype=int64)
+        masks = ones((1, img.size[0], img.size[1]), dtype=int64)
+        labels = zeros((1,), dtype=int64)
+        boxes = [[0, 0, img.size[0], img.size[1]]]
+        boxes = as_tensor(boxes, dtype=float32)
+        target = {'boxes': boxes, 'labels': labels, 'masks': masks, 'area': area, 'path': path}
+        x = self.transforms(img)
+        return x, target
+
 
 def build_databunch(data_dir, img_sz, batch_sz, class_names):
-
     num_workers = 0
 
     train_dir = join(data_dir, 'train')
@@ -112,7 +122,8 @@ def build_databunch(data_dir, img_sz, batch_sz, class_names):
         valid_ds,
         batch_size=batch_sz,
         num_workers=num_workers,
-        pin_memory=True)
+        pin_memory=True,
+        collate_fn=collate_fn)
 
     return DataBunch(train_ds, train_dl, valid_ds, valid_dl, class_names)
 
