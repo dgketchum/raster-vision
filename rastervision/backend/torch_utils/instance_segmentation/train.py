@@ -37,18 +37,42 @@ def train_epoch(model, device, data_loader, opt, loss_fn, step_scheduler=None):
 
 
 def validate_epoch(model, device, data_loader, num_labels):
-    # TODO: build validation once training learns on new data
-    # model.eval()
-    #
-    # conf_mat = torch.zeros((num_labels, num_labels))
-    # with torch.no_grad():
-    #     with click.progressbar(data_loader, label='Validating') as bar:
-    #         for batch_ind, (x, target) in enumerate(bar):
-    #             pass
-                # x = [_.to(device) for _ in x]
-                # out = model(x)
+    model.eval()
 
-    # Ignore index zero.
-    # conf_mat = conf_mat[1:, 1:]
-    # return compute_conf_mat_metrics(conf_mat)
-    pass
+    ys = []
+    outs = []
+    conf_mat = torch.zeros((num_labels, num_labels))
+    with torch.no_grad():
+        with click.progressbar(data_loader, label='Validating') as bar:
+            for batch_ind, (x, target) in enumerate(bar):
+                x = [_.to(device) for _ in x]
+                out = model(x)
+
+                outs.extend([_out.cpu() for _out in out])
+
+    coco_eval = compute_coco_eval(outs, ys, num_labels)
+
+    conf_mat = conf_mat[1:, 1:]
+    cf = compute_conf_mat_metrics(conf_mat)
+
+    metrics = {
+        'map': 0.0,
+        'map50': 0.0,
+        'mean_f1': 0.0,
+        'mean_score_thresh': 0.5,
+        'confusion_matrix': cf
+    }
+    if coco_eval is not None:
+        coco_metrics = coco_eval.stats
+        best_f1s, best_scores = compute_class_f1(coco_eval)
+        mean_f1 = np.mean(best_f1s[1:])
+        mean_score_thresh = np.mean(best_scores[1:])
+        metrics = {
+            'map': coco_metrics[0],
+            'map50': coco_metrics[1],
+            'mean_f1': mean_f1,
+            'mean_score_thresh': mean_score_thresh,
+            'confusion_matrix': cf,
+        }
+
+    return metrics
