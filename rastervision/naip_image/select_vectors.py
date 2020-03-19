@@ -147,24 +147,30 @@ def clean_out_training_data(parent_dir):
 
 if __name__ == '__main__':
     home = os.path.expanduser('~')
+    # remote_disk = '/media/research/'
+    # if os.path.exists(remote_disk):
+    #     home = remote_disk
+        
     extraction = os.path.join(home, 'field_extraction')
-    states = [('AZ', 2015), ('CA', 2018), ('CO', 2017), ('MT', 2017), ('NM', 2018),
-              ('NV', 2017), ('OR', 2016), ('UT', 2018), ('WY', 2017)]
-    for state, year in states[2:]:
-        try:
-            tables = os.path.join(extraction, 'training_data', '{}'.format(state))
-            if not os.path.exists(tables):
-                os.mkdir(tables)
-            shape_dir = os.path.join(home, 'IrrigationGIS', 'openET', '{}'.format(state))
-            shapes = os.path.join(shape_dir, '{}.shp'.format(state.lower()))
-            target_number = 500
-            if not os.path.exists(shapes):
-                raise ValueError('{} does not exist'.format(shapes))
+    # states = [('AZ', 2015), ('CA', 2018), ('CO', 2017), ('MT', 2017), ('NM', 2018),
+    #           ('NV', 2017), ('OR', 2016), ('UT', 2018), ('WY', 2017)]
+    states = [('WA', 2017)]
+    for state, year in states:
+        # try:
+        out_data = os.path.join(extraction, 'field_data',
+                              'raw_data', 'states', '{}'.format(state))
+        if not os.path.exists(out_data):
+            os.mkdir(out_data)
+        shape_dir = os.path.join(extraction, 'field_data', 'raw_shapefiles')
+        shapes = os.path.join(shape_dir, '{}_{}.shp'.format(state, year))
+        target_number = 500
+        if not os.path.exists(shapes):
+            raise ValueError('{} does not exist'.format(shapes))
 
-            geos = get_geometries(shapes, n=5 * target_number)
-            get_training_scenes(geos, instance_label=True, state='{}'.format(state),
-                                out_dir=tables, year=year, n=target_number)
-        except Exception as e:
-            print(state, e)
+        geos = get_geometries(shapes, n=5 * target_number)
+        get_training_scenes(geos, instance_label=True, state='{}'.format(state),
+                            out_dir=out_data, year=year, n=target_number)
+        # except Exception as e:
+        #     print(state, e)
     # clean_out_training_data(tables)
 # ========================= EOF ====================================================================

@@ -152,12 +152,12 @@ class ApfoNaip(NaipImage):
             epoch = '1230768000000%2C1262304000000'
 
         self.naip_base_url = 'https://services.nationalmap.gov/arcgis/rest/services/USGSNAIPImagery/'
-        self.usda_query_str = 'ImageServer/exportImage?&bbox={a}' \
+        self.usda_query_str = 'ImageServer/exportImage?&bbox={a}&time={b}' \
                               '&imageSR=4326&bboxSR=4326&size=2048,2048' \
                               '&format=tiff&pixelType=U8' \
                               '&mosaicRule=%7B%22mosaicMethod%22%3A%22esriMosaicNorthwest%22%2C%22' \
                               'sortField%22%3A%22%22%2C%22mosaicOperation%22%3A%22MT_FIRST%22%7D&' \
-                              'pixelType=f32&f=image'.format(a=bbox)
+                              'pixelType=f32&f=image'.format(a=bbox, b=epoch)
 
         for key, val in kwargs.items():
             self.__setattr__(key, val)
