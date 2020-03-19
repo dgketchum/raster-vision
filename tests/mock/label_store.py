@@ -16,14 +16,14 @@ class MockLabelStore(LabelStore):
     def __init__(self):
         self.mock = Mock()
 
-        self.mock.get_labels.return_value = None
+        self.mock.get_label_array.return_value = None
         self.mock.empty_labels.return_value = None
 
     def save(self, labels):
         self.mock.save(labels)
 
     def get_labels(self):
-        result = self.mock.get_labels()
+        result = self.mock.get_label_array()
         if result is None:
             return ChipClassificationLabels()
         else:

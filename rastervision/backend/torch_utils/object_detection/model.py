@@ -35,13 +35,18 @@ def resnet_fpn_backbone(backbone_name, pretrained):
     for name, parameter in backbone.named_parameters():
         if 'layer2' not in name and 'layer3' not in name and 'layer4' not in name:
             parameter.requires_grad_(False)
+            print('no grad', name)
+        else:
+            print('grad', name)
 
     return_layers = {'layer1': 0, 'layer2': 1, 'layer3': 2, 'layer4': 3}
 
     out_channels = 256
     in_channels_list = get_out_channels(backbone)
-    return BackboneWithFPN(backbone, return_layers, in_channels_list,
-                           out_channels)
+    return BackboneWithFPN(backbone,
+                           return_layers=return_layers,
+                           in_channels_list=in_channels_list,
+                           out_channels=out_channels)
 
 
 class MyFasterRCNN(nn.Module):
@@ -126,3 +131,7 @@ class MyFasterRCNN(nn.Module):
             non_zero_inds = labels != 0
             new_boxlists.append(bl.ind_filter(non_zero_inds))
         return new_boxlists
+
+
+if __name__ == '__main__':
+    resnet_fpn_backbone('resnet50', pretrained=True)

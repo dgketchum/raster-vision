@@ -3,7 +3,7 @@ from copy import deepcopy
 
 import rastervision as rv
 from rastervision.data.label_store import (
-    LabelStoreConfig, LabelStoreConfigBuilder, InstanceSegmentationRasterStore)
+    LabelStoreConfig, LabelStoreConfigBuilder, InstanceSegmentationLabelStore)
 from rastervision.protos.label_store_pb2 import LabelStoreConfig as LabelStoreConfigMsg
 
 VectorOutput = LabelStoreConfigMsg.InstanceSegmentationRasterStore.VectorOutput
@@ -87,7 +87,7 @@ class InstanceSegmentationRasterStoreConfig(LabelStoreConfig):
         if self.rgb:
             class_map = task_config.class_map
 
-        return InstanceSegmentationRasterStore(
+        return InstanceSegmentationLabelStore(
             self.uri,
             extent,
             crs_transformer,

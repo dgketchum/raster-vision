@@ -11,7 +11,7 @@ log = logging.getLogger(__name__)
 def _make_chip_pos_windows(image_extent, label_store, chip_size):
     chip_size = chip_size
     pos_windows = []
-    boxes = label_store.get_labels().get_boxes()
+    boxes = label_store.get_label_array().get_boxes()
     done_boxes = set()
 
     # Get a random window around each box. If a box was previously included
@@ -29,7 +29,7 @@ def _make_chip_pos_windows(image_extent, label_store, chip_size):
             pos_windows.append(window)
 
             # Get boxes that lie completely within window
-            window_boxes = label_store.get_labels(window=window)
+            window_boxes = label_store.get_label_array(window=window)
             window_boxes = ObjectDetectionLabels.get_overlapping(
                 window_boxes, window, ioa_thresh=1.0)
             window_boxes = window_boxes.get_boxes()
@@ -41,7 +41,7 @@ def _make_chip_pos_windows(image_extent, label_store, chip_size):
 
 def _make_label_pos_windows(image_extent, label_store, label_buffer):
     pos_windows = []
-    for box in label_store.get_labels().get_boxes():
+    for box in label_store.get_label_array().get_boxes():
         window = box.make_buffer(label_buffer, image_extent)
         pos_windows.append(window)
 
@@ -69,7 +69,7 @@ def make_neg_windows(raster_source, label_store, chip_size, nb_windows,
                 break
         chip = raster_source.get_chip(window)
         labels = ObjectDetectionLabels.get_overlapping(
-            label_store.get_labels(), window, ioa_thresh=0.2)
+            label_store.get_label_array(), window, ioa_thresh=0.2)
 
         # If no labels and not blank, append the chip
         if len(labels) == 0 and np.sum(chip.ravel()) > 0:
@@ -125,7 +125,7 @@ class ObjectDetection(Task):
         return pos_windows + neg_windows
 
     def get_train_labels(self, window, scene):
-        window_labels = scene.ground_truth_label_source.get_labels(
+        window_labels = scene.ground_truth_label_source.get_label_array(
             window=window)
         return ObjectDetectionLabels.get_overlapping(
             window_labels,

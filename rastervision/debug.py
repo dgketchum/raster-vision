@@ -15,8 +15,8 @@ from viz import display_instances
 model_urls = {'maskrcnn_resnet50_fpn_coco':
               'https://download.pytorch.org/models/maskrcnn_resnet50_fpn_coco-bf2d0c1e.pth'}
 
-dir_ = '/home/dgketchum/field_extraction/training_data/example/COCO/image_train'
-out_dir_ = '/home/dgketchum/field_extraction/training_data/example/COCO/pred'
+dir_ = '/home/dgketchum/field_extraction/COCO/data/image_test'
+out_dir_ = '/home/dgketchum/field_extraction/COCO/data/pred'
 images = [os.path.join(dir_, x) for x in os.listdir(dir_)]
 shuffle(images)
 
@@ -55,6 +55,7 @@ def train(model, load_dataset):
 
 def visualize(model, images, max_images):
     ct = 0
+    device = torch.device("cuda:0")
     model = model.eval()
     for image in images:
         im = np.array(Image.open(image).convert('RGB'))
@@ -81,5 +82,5 @@ def visualize(model, images, max_images):
 
 if __name__ == '__main__':
     model = get_model()
-    train(model, load_dataset)
+    visualize(model, images, max_images=3)
 # ========================= EOF ====================================================================

@@ -183,7 +183,7 @@ def test_prediction_package_results(experiment, test, temp_dir, scenes,
 
         scene = scene_config.create_scene(experiment.task, temp_dir)
 
-        scene_labels = scene.prediction_label_store.get_labels()
+        scene_labels = scene.prediction_label_store.get_label_array()
 
         extent = scene.raster_source.get_extent()
         crs_transformer = scene.raster_source.get_crs_transformer()
@@ -198,7 +198,7 @@ def test_prediction_package_results(experiment, test, temp_dir, scenes,
 
         from rastervision.data import ActivateMixin
         with ActivateMixin.compose(scene, predictor_label_store):
-            if not predictor_label_store.get_labels() == scene_labels:
+            if not predictor_label_store.get_label_array() == scene_labels:
                 e = TestError(
                     test, ('Predictor did not produce the same labels '
                            'as the Predict command'),

@@ -72,8 +72,8 @@ class InstanceSegmentationEvaluation(ClassificationEvaluation):
         conf_mat = np.zeros((len(labels), len(labels)))
         for window in pred_labels.get_windows():
             log.debug('Evaluating window: {}'.format(window))
-            gt_arr = gt_labels.get_label_arr(window).ravel()
-            pred_arr = pred_labels.get_label_arr(window).ravel()
+            gt_arr = gt_labels.get_label_array(window).ravel()
+            pred_arr = pred_labels.get_label_array(window).ravel()
             conf_mat += confusion_matrix(gt_arr, pred_arr, labels=labels)
 
         for class_id in self.class_map.get_keys():

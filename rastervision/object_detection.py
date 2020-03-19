@@ -4,13 +4,12 @@ import rastervision as rv
 
 if 'home' in os.getcwd():
     home = os.path.expanduser('~')
-    ROOT_URI = os.path.join(home, 'field_extraction', 'training_data')
-    PROCESSED_URI = os.path.join(ROOT_URI, 'example', 'COCO')
+    ROOT_URI = os.path.join(home, 'field_extraction', 'WA')
+    PROCESSED_URI = os.path.join(ROOT_URI, 'data')
     TMP = os.environ['TMPDIR'] = os.path.join(ROOT_URI, 'tmp')
-    os.environ['TORCH_HOME'] = os.path.join(home, 'field_extraction', 'torche-cache')
-    os.environ['GDAL_DATA'] = os.path.join(home,
-                                           'miniconda2/envs/vision/lib/python3.7/site-packages/rasterio/gdal_data')
-
+    os.environ['TORCH_HOME'] = os.path.join(home, 'field_extraction', 'torch-cache')
+    os.environ['GDAL_DATA'] = os.path.join(home, 'miniconda2/envs/vision/lib/python3.7',
+                                           'site-packages/rasterio/gdal_data')
 else:
     ROOT_URI = '/opt/data/training_data'
     PROCESSED_URI = os.path.join(ROOT_URI, 'example')
@@ -97,7 +96,7 @@ if __name__ == '__main__':
     rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
     # rv.main()
 
-    # cmd = '/home/dgketchum/field_extraction/training_data/train/washington-object-detection-test/command-config-0.json'
+    # cmd = '/home/dgketchum/field_extraction/WA/train/washington-object-detection-test/command-config-0.json'
     # rv.runner.CommandRunner.run(cmd)
 
 # ========================= EOF ====================================================================

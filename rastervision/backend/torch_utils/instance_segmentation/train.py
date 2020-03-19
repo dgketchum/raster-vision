@@ -3,6 +3,7 @@ import torch
 from torch.autograd import detect_anomaly
 from rastervision.backend.torch_utils.metrics import (compute_conf_mat,
                                                       compute_conf_mat_metrics)
+from rastervision.backend.torch_utils.object_detection.metrics import compute_coco_eval
 
 
 def train_epoch(model, device, data_loader, opt, loss_fn, step_scheduler=None):
@@ -32,12 +33,16 @@ def train_epoch(model, device, data_loader, opt, loss_fn, step_scheduler=None):
 
                 if torch.isnan(loss):
                     print(num_samples, paths)
+            else:
+                print('zero detections')
 
         return loss_floats
 
 
 def validate_epoch(model, device, data_loader, num_labels):
     model.eval()
+
+    out_types = ['masks', 'boxes', 'labels', 'scores']
 
     ys = []
     outs = []
@@ -47,8 +52,10 @@ def validate_epoch(model, device, data_loader, num_labels):
             for batch_ind, (x, target) in enumerate(bar):
                 x = [_.to(device) for _ in x]
                 out = model(x)
-
-                outs.extend([_out.cpu() for _out in out])
+                output = [{t: o[t].cpu().numpy() for (i, t) in enumerate(out_types)} for o in out]
+                outs.extend(output)
+                if len(outs) > 99:
+                    break
 
     coco_eval = compute_coco_eval(outs, ys, num_labels)
 

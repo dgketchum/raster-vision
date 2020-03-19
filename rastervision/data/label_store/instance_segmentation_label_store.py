@@ -44,9 +44,10 @@ class InstanceSegmentationLabelStore(LabelStore):
         self.extent = extent
         self.crs_transformer = crs_transformer
         self.tmp_dir = tmp_dir
-        # Note: can't name this class_transformer due to Python using that attribute
         if class_map:
-            self.class_trans = SegmentationClassTransformer(class_map)
+            self.class_trans = True
+            # TODO re-implement this class, get RGB for labels from ClassTransformer
+            # self.class_trans = SegmentationClassTransformer(class_map)
         else:
             self.class_trans = None
 

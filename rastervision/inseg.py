@@ -25,7 +25,7 @@ class InstanceSegmentationExperiments(rv.ExperimentSet):
 
         debug = True
         num_epochs = 40
-        batch_size = 7
+        batch_size = 2
 
         task = rv.TaskConfig.builder(rv.INSTANCE_SEGMENTATION) \
             .with_chip_size(300) \
@@ -106,7 +106,7 @@ if __name__ == '__main__':
     # rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
     # rv.main()
 
-    cmd = '/home/dgketchum/field_extraction/WA/predict/washington-inseg/command-config-0.json'
+    cmd = '/home/dgketchum/field_extraction/WA/train/washington-inseg/command-config-0.json'
     rv.runner.CommandRunner.run(cmd)
 
 # ====================================== EOF =================================================================

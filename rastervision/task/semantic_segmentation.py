@@ -73,7 +73,7 @@ class SemanticSegmentation(Task):
             if 0 in self.config.class_map.get_keys():
                 filt_windows = []
                 for w in windows:
-                    label_arr = label_source.get_labels(w).get_label_arr(w)
+                    label_arr = label_source.get_label_array(w).get_label_array(w)
                     ignore_inds = label_arr.ravel() == 0
                     if np.all(ignore_inds):
                         pass
@@ -167,7 +167,7 @@ class SemanticSegmentation(Task):
 
         """
         label_store = scene.ground_truth_label_source
-        return label_store.get_labels(window)
+        return label_store.get_label_array(window)
 
     def get_predict_windows(self, extent: Box) -> List[Box]:
         """Get windows over-which predictions will be calculated.
@@ -198,7 +198,7 @@ class SemanticSegmentation(Task):
         def label_fn(window):
             chip = raster_source.get_chip(window)
             labels = self.backend.predict([chip], [window], tmp_dir)
-            label_arr = labels.get_label_arr(window)
+            label_arr = labels.get_label_array(window)
 
             # Set NODATA pixels in imagery to predicted value of 0 (ie. ignore)
             label_arr[np.sum(chip, axis=2) == 0] = 0

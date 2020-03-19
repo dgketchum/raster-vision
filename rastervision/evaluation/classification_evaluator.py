@@ -28,8 +28,8 @@ class ClassificationEvaluator(Evaluator):
             label_source = scene.ground_truth_label_source
             label_store = scene.prediction_label_store
             with ActivateMixin.compose(label_source, label_store):
-                ground_truth = label_source.get_labels()
-                predictions = label_store.get_labels()
+                ground_truth = label_source.get_label_array()
+                predictions = label_store.get_label_array()
 
                 if scene.aoi_polygons:
                     # Filter labels based on AOI.

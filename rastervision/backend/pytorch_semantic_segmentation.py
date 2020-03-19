@@ -134,7 +134,7 @@ class PyTorchSemanticSegmentation(Backend):
             chip_path = join(img_dir, '{}-{}.png'.format(scene.id, ind))
             label_path = join(labels_dir, '{}-{}.png'.format(scene.id, ind))
 
-            label_im = labels.get_label_arr(window).astype(np.uint8)
+            label_im = labels.get_label_array(window).astype(np.uint8)
             save_img(label_im, label_path)
             save_img(chip, chip_path)
 

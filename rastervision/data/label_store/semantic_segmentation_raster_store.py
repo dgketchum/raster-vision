@@ -110,6 +110,7 @@ class SemanticSegmentationRasterStore(LabelStore):
 
         # https://github.com/mapbox/rasterio/blob/master/docs/quickstart.rst
         # https://rasterio.readthedocs.io/en/latest/topics/windowed-rw.html
+
         with rasterio.open(
                 local_path,
                 'w',
@@ -121,7 +122,7 @@ class SemanticSegmentationRasterStore(LabelStore):
                 transform=transform,
                 crs=crs) as dataset:
             for window in labels.get_windows():
-                class_labels = labels.get_label_arr(
+                class_labels = labels.get_label_array(
                     window, clip_extent=self.extent)
                 clipped_window = ((window.ymin,
                                    window.ymin + class_labels.shape[0]),

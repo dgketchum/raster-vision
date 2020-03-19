@@ -53,7 +53,7 @@ def make_tf_examples(training_data: TrainingData, class_map: ClassMap) -> List:
     log.info('Creating TFRecord')
     for chip, window, labels in training_data:
         tf_example = create_tf_example(chip, window,
-                                       labels.get_label_arr(window), class_map)
+                                       labels.get_label_array(window), class_map)
         tf_examples.append(tf_example)
     return tf_examples
 

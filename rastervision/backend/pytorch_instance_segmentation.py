@@ -135,7 +135,7 @@ class PyTorchInstanceSegmentation(Backend):
             chip_path = join(img_dir, '{}-{}.png'.format(scene.id, ind))
             label_path = join(labels_dir, '{}-{}.png'.format(scene.id, ind))
 
-            label_im = labels.get_label_arr(window).astype(np.uint8)
+            label_im = labels.get_label_array(window).astype(np.uint8)
 
             try:
                 label_im = label_im.sum(axis=2)
@@ -304,18 +304,17 @@ class PyTorchInstanceSegmentation(Backend):
             log.info('-----------------------------------------------------')
             log.info('epoch: {}'.format(epoch))
             start = time.time()
-            train_loss = train_epoch(model, self.device, databunch.train_dl,
-                                     opt, loss_fn, step_scheduler)
-
-            if epoch_scheduler:
-                epoch_scheduler.step()
-            log.info('train loss: {}'.format(train_loss))
+            # train_loss = train_epoch(model, self.device, databunch.train_dl,
+            #                          opt, loss_fn, step_scheduler)
+            #
+            # if epoch_scheduler:
+            #     epoch_scheduler.step()
+            # log.info('train loss: {}'.format(train_loss))
 
             # Validate one epoch.
-            # TODO: reinstate validation once training learns on new data
-            # metrics = validate_epoch(model, self.device, databunch.valid_dl,
-            #                          num_labels)
-            # log.info('validation metrics: {}'.format(metrics))
+            metrics = validate_epoch(model, self.device, databunch.valid_dl,
+                                     num_labels)
+            log.info('validation metrics: {}'.format(metrics))
 
             # Print elapsed time for epoch.
             end = time.time()
@@ -328,19 +327,19 @@ class PyTorchInstanceSegmentation(Backend):
             json_to_file(train_state, train_state_path)
 
             # Append to log CSV file.
-            # with open(log_path, 'a') as log_file:
-            #     log_writer = csv.writer(log_file)
-            #     row = [epoch, epoch_time, train_loss]
-            #     row += [metrics[k] for k in metric_names]
-            #     log_writer.writerow(row)
+            with open(log_path, 'a') as log_file:
+                log_writer = csv.writer(log_file)
+                row = [epoch, epoch_time, train_loss]
+                row += [metrics[k] for k in metric_names]
+                log_writer.writerow(row)
 
             # Write to Tensorboard log.
-            # if self.train_opts.log_tensorboard:
-            #     for key, val in metrics.items():
-            #         tb_writer.add_scalar(key, val, epoch)
-            #     tb_writer.add_scalar('train_loss', train_loss, epoch)
-            #     for name, param in model.named_parameters():
-            #         tb_writer.add_histogram(name, param, epoch)
+            if self.train_opts.log_tensorboard:
+                for key, val in metrics.items():
+                    tb_writer.add_scalar(key, val, epoch)
+                tb_writer.add_scalar('train_loss', train_loss, epoch)
+                for name, param in model.named_parameters():
+                    tb_writer.add_histogram(name, param, epoch)
 
             if (train_uri.startswith('s3://')
                     and (((epoch + 1) % self.train_opts.sync_interval) == 0)):
@@ -384,25 +383,23 @@ class PyTorchInstanceSegmentation(Backend):
         Return:
             (InstanceSegmentationLabels) containing predictions
         """
+
         self.load_model(tmp_dir)
 
         chips = torch.Tensor(chips).permute((0, 3, 1, 2)) / 255.
         chips = chips.to(self.device)
-
-        if self.backend_opts.pretrained_uri:
-            norm = Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-            chips = norm(chips.squeeze(0))
-
         chips = [torch.squeeze(chips).to(self.device)]
 
         model = self.model.eval()
         with torch.no_grad():
-            out = model(chips)
+            output = model(chips)
 
-        def label_fn(_window):
-            if _window == windows[0]:
-                return out[0]['masks'].cpu().argmax(0).squeeze().numpy()
-            else:
-                raise ValueError('Trying to get labels for unknown window.')
+            score_idx = output[0]['scores'].cpu().numpy() > 0.50
+            out_types = ['masks', 'boxes', 'labels', 'scores']
+            output = [{t: o[t].cpu().numpy()[score_idx] for (i, t) in enumerate(out_types)} for o in output]
+            # TODO: where to cut down low-prob results, in model definition? -> MaskRCNN.box_score_thresh?
+            for i, o in enumerate(output):
+                o['boxes'] = InstanceSegmentationLabels.local_to_global(o['boxes'], windows[i])
 
-        return InstanceSegmentationLabels(windows, label_fn)
+        return InstanceSegmentationLabels(windows, output[0])
+

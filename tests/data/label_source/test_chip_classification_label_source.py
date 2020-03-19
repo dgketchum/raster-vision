@@ -202,7 +202,7 @@ class TestChipClassificationLabelSource(unittest.TestCase):
         source = config.create_source(self.task_config, extent,
                                       self.crs_transformer, self.temp_dir.name)
 
-        labels = source.get_labels()
+        labels = source.get_label_array()
         cells = labels.get_cells()
 
         self.assertEqual(len(cells), 4)
@@ -226,7 +226,7 @@ class TestChipClassificationLabelSource(unittest.TestCase):
                    .from_proto(msg).build()
         source = config.create_source(self.task_config, extent,
                                       self.crs_transformer, self.temp_dir.name)
-        labels = source.get_labels()
+        labels = source.get_label_array()
 
         cells = labels.get_cells()
         self.assertEqual(len(cells), 1)
@@ -246,7 +246,7 @@ class TestChipClassificationLabelSource(unittest.TestCase):
                    .from_proto(msg).build()
         source = config.create_source(self.task_config, extent,
                                       self.crs_transformer, self.temp_dir.name)
-        labels = source.get_labels()
+        labels = source.get_label_array()
 
         cells = labels.get_cells()
         self.assertEqual(len(cells), 2)

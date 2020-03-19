@@ -70,7 +70,7 @@ class TestChipClassificationGeoJSONStore(unittest.TestCase):
         label_store = config.create_store(
             self.task_config, extent, self.crs_transformer, self.temp_dir.name)
 
-        labels1 = label_store.get_labels()
+        labels1 = label_store.get_label_array()
         new_uri = os.path.join(self.temp_dir.name, 'test_save_reload.json')
         msg = rv.LabelStoreConfig.builder(rv.CHIP_CLASSIFICATION_GEOJSON) \
                 .with_uri(new_uri) \
@@ -80,7 +80,7 @@ class TestChipClassificationGeoJSONStore(unittest.TestCase):
         label_store = config.create_store(
             self.task_config, extent, self.crs_transformer, self.temp_dir.name)
         label_store.save(labels1)
-        labels2 = label_store.get_labels()
+        labels2 = label_store.get_label_array()
 
         self.assertDictEqual(labels1.cell_to_class_id,
                              labels2.cell_to_class_id)

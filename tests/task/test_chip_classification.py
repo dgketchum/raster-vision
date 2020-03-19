@@ -66,7 +66,7 @@ class TestChipClassification(unittest.TestCase):
             ls = label_source_2.create_source(
                 task_config, scene.raster_source.get_extent(),
                 scene.raster_source.get_crs_transformer(), tmp_dir)
-            actual = ls.get_labels().get_cells()
+            actual = ls.get_label_array().get_cells()
 
             self.assertEqual(len(windows), len(actual))
 

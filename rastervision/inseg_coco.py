@@ -198,7 +198,7 @@ if __name__ == '__main__':
     # i = InstanceSegmentationExperiments().exp_main()
     # rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
 
-    cmd = '/home/dgketchum/field_extraction/COCO/chip/coco-inseg/command-config-0.json'
+    cmd = '/home/dgketchum/field_extraction/COCO/train/coco-inseg/command-config-0.json'
     rv.runner.CommandRunner.run(cmd)
 
 # ====================================== EOF =================================================================

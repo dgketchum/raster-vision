@@ -13,7 +13,7 @@ def draw_debug_predict_image(scene, class_map):
     img = scene.raster_source.get_image_array()
     img = Image.fromarray(img)
     draw = ImageDraw.Draw(img, 'RGB')
-    labels = scene.prediction_label_store.get_labels()
+    labels = scene.prediction_label_store.get_label_array()
     line_width = 4
     default_colors = [
         'red', 'orange', 'yellow', 'green', 'brown', 'pink', 'purple'
@@ -44,7 +44,7 @@ class ChipClassification(Task):
         return result
 
     def get_train_labels(self, window, scene):
-        return scene.ground_truth_label_source.get_labels(window=window)
+        return scene.ground_truth_label_source.get_label_array(window=window)
 
     def post_process_predictions(self, labels, scene):
         return labels

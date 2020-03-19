@@ -15,10 +15,10 @@ class MockLabelSource(LabelSource):
     def __init__(self):
         self.mock = Mock()
 
-        self.mock.get_labels.return_value = None
+        self.mock.get_label_array.return_value = None
 
     def get_labels(self, window=None):
-        result = self.mock.get_labels(window)
+        result = self.mock.get_label_array(window)
         if result is None:
             return ChipClassificationLabels()
         else:
