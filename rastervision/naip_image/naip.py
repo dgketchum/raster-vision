@@ -177,7 +177,7 @@ class ApfoNaip(NaipImage):
 
         req = get(url, verify=False, stream=True)
         if req.status_code != 200:
-            raise ValueError('Bad response {} from NAIP API request.'.format(req.status_code))
+            raise ValueError('Bad response {} from NAIP API request \n {}.'.format(req.status_code, url))
 
         with open(self.temp_file, 'wb') as f:
             for chunk in req.iter_content(chunk_size=1024):

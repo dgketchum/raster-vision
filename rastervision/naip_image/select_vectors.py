@@ -66,7 +66,8 @@ def get_naip_polygon(bbox):
                     [bbox[2], bbox[1]]])
 
 
-def get_training_scenes(geometries, instance_label=False, name_prefix='MT', out_dir=None, year=None, n=10):
+def get_training_scenes(geometries, instance_label=False, name_prefix='MT', out_dir=None,
+                        year=None, n=10, save_shp=False):
 
     ct = 0
 
@@ -77,72 +78,79 @@ def get_training_scenes(geometries, instance_label=False, name_prefix='MT', out_
     [os.mkdir(x) for x in [overview, image, labels] if not os.path.exists(x)]
 
     for (id_, type_, g) in geometries:
-        g = Polygon(g['coordinates'][0])
-        naip_args = dict([('dst_crs', '4326'),
-                          ('centroid', (g.centroid.y, g.centroid.x)),
-                          ('buffer', 1000),
-                          ('year', year)])
+        try:
+            print('feature {}'.format(id_))
+            g = Polygon(g['coordinates'][0])
+            naip_args = dict([('dst_crs', '4326'),
+                              ('centroid', (g.centroid.y, g.centroid.x)),
+                              ('buffer', 1000),
+                              ('year', year)])
 
-        naip = ApfoNaip(**naip_args)
-        array, profile = naip.get_image(name_prefix)
-        naip.save(array, profile, TEMP_TIF)
-        naip_geometry = get_naip_polygon(naip.bbox)
-        src = rasterio.open(TEMP_TIF)
+            naip = ApfoNaip(**naip_args)
+            array, profile = naip.get_image(name_prefix)
+            naip.save(array, profile, TEMP_TIF)
+            naip_geometry = get_naip_polygon(naip.bbox)
+            src = rasterio.open(TEMP_TIF)
 
-        vectors = [(id_, type_, g) for geo in geometries if
-                   Polygon(geo[2]['coordinates'][0]).centroid.intersects(naip_geometry)]
-        
-        # geos = [Polygon(x[2]['coordinates'][0]).centroid for x in geometries]
-        # data = [(x[0], x[1]) for x in geometries]
-        # gpd = GeoDataFrame(data=data, geometry=geos)
-        # s_idx = list(gpd.intersection(naip_geometry))
-        # vectors = list(gpd.iloc[s_idx])
-        
-        fig, ax = plt.subplots()
-        rasterio.plot.show((src, 1), cmap='viridis', ax=ax)
+            vectors = [(i, t, g) for (i, t, g) in geometries if
+                       Polygon(g['coordinates'][0]).centroid.intersects(naip_geometry)]
+            
+            # s_idx = list(gpd.intersection(naip_geometry))
+            # vectors = list(gpd.iloc[s_idx])
 
-        patches = [PolygonPatch(Polygon(geo[2]), edgecolor="red", facecolor="none",
-                                linewidth=1.) for geo in vectors]
+            fig, ax = plt.subplots()
+            rasterio.plot.show((src, 1), cmap='viridis', ax=ax)
 
-        ax.add_collection(cplt.PatchCollection(patches, match_original=True))
-        ax.set_xlim(naip_geometry.bounds[0], naip_geometry.bounds[2])
-        ax.set_ylim(naip_geometry.bounds[1], naip_geometry.bounds[3])
+            patches = [PolygonPatch(Polygon(geo[2]['coordinates'][0]),
+                                    edgecolor="red", facecolor="none",
+                                    linewidth=1.) for geo in vectors]
 
-        name = '{}_{}'.format(name_prefix, id_)
-        fig_name = os.path.join(overview, '{}.png'.format(name))
-        plt.savefig(fig_name)
-        plt.close(fig)
+            ax.add_collection(cplt.PatchCollection(patches, match_original=True))
+            ax.set_xlim(naip_geometry.bounds[0], naip_geometry.bounds[2])
+            ax.set_ylim(naip_geometry.bounds[1], naip_geometry.bounds[3])
 
-        fs, unit = file_size(fig_name)
-        if fs < 300 and unit == 'KB':
-            print(fs, unit)
-            os.remove(fig_name)
+            name = '{}_{}'.format(name_prefix, id_)
+            if save_shp:
+                geos = [Polygon(x[2]['coordinates'][0]) for x in vectors]
+                data = [(x[0], x[1]) for x in vectors]
+                gpd = GeoDataFrame(data=data, geometry=geos, columns=['id', 'TYPE'])
+                shp_name = os.path.join(overview, '{}.shp'.format(name))
+                gpd.to_file(shp_name)
+                
+            fig_name = os.path.join(overview, '{}.png'.format(name))
+            plt.savefig(fig_name)
+            plt.close(fig)
 
-        else:
-            os.rename(TEMP_TIF, os.path.join(image, '{}.tif'.format(name)))
-            naip_bool_name = os.path.join(labels, '{}.tif'.format(name))
+            fs, unit = file_size(fig_name)
+            if fs < 200. and unit == 'KB':
+                print(fs, unit)
+                os.remove(fig_name)
 
-            meta = src.meta.copy()
-            meta.update(compress='lzw')
-            meta.update(nodata=0)
-            meta.update(count=1)
-
-            if instance_label:
-                label_values = [(f[2], i) for i, f in enumerate(vectors)]
             else:
-                label_values = [(f[2], 1) for f in vectors]
+                os.rename(TEMP_TIF, os.path.join(image, '{}.tif'.format(name)))
+                naip_bool_name = os.path.join(labels, '{}.tif'.format(name))
+    
+                meta = src.meta.copy()
+                meta.update(compress='lzw')
+                meta.update(nodata=0)
+                meta.update(count=1)
+    
+                if instance_label:
+                    label_values = [(f[2], i) for i, f in enumerate(vectors)]
+                else:
+                    label_values = [(f[2], 1) for f in vectors]
+    
+                with rasterio.open(naip_bool_name, 'w', **meta) as out:
+                    burned = rasterize(shapes=label_values, fill=0, dtype=uint8,
+                                       out_shape=(array.shape[1], array.shape[2]), transform=out.transform,
+                                       all_touched=False)
+                    out.write(burned, 1)
+                ct += 1
+                plt.close()
 
-            with rasterio.open(naip_bool_name, 'w', **meta) as out:
-                burned = rasterize(shapes=label_values, fill=0, dtype=uint8,
-                                   out_shape=(array.shape[1], array.shape[2]), transform=out.transform,
-                                   all_touched=False)
-                out.write(burned, 1)
-            ct += 1
-
-            plt.close()
-
-        if ct >= n:
-            break
+        except ValueError as e:
+            print('error {}'.format(e))
+            pass
 
 
 def clean_out_training_data(parent_dir):
@@ -179,8 +187,8 @@ if __name__ == '__main__':
             raise ValueError('{} does not exist'.format(shapes))
 
         geos = get_geometries(shapes, n=target_number)
-        get_training_scenes(geos, instance_label=True, name_prefix=name_prefix,
-                            out_dir=out_data, year=year, n=target_number)
+        get_training_scenes(geos, instance_label=True, name_prefix=name_prefix, out_dir=out_data, year=year,
+                            n=target_number, save_shp=False)
         # except Exception as e:
         #     print(state, e)
     # clean_out_training_data(tables)
