@@ -27,8 +27,9 @@ from matplotlib import collections as cplt
 import rasterio
 import rasterio.plot
 from rasterio.features import rasterize
+from fiona import open as fiona_open
 from descartes import PolygonPatch
-from geopandas import read_file
+from geopandas import read_file, GeoDataFrame
 from pandas import DataFrame
 from shapely.geometry import Polygon
 from naip_image.naip import ApfoNaip
@@ -50,19 +51,22 @@ def file_size(file_path):
 
 
 def get_geometries(shp, n=100):
-    gdf = read_file(shp)
-    gdf = gdf.head(n=n)
-    df = DataFrame(gdf)
-    df = df.sample(frac=1.)
-    return df['geometry']
-
+    features = []
+    ct = 0
+    with fiona_open(shp, 'r') as src:
+        for feat in src:
+            if ct > n:
+                break
+            features.append((int(feat['properties']['ID']), feat['properties']['TYPE'], feat['geometry']))
+    return features
+            
 
 def get_naip_polygon(bbox):
     return Polygon([[bbox[0], bbox[1]], [bbox[0], bbox[3]], [bbox[2], bbox[3]],
                     [bbox[2], bbox[1]]])
 
 
-def get_training_scenes(geometries, instance_label=False, state='MT', out_dir=None, year=None, n=10):
+def get_training_scenes(geometries, instance_label=False, name_prefix='MT', out_dir=None, year=None, n=10):
 
     ct = 0
 
@@ -72,31 +76,39 @@ def get_training_scenes(geometries, instance_label=False, state='MT', out_dir=No
 
     [os.mkdir(x) for x in [overview, image, labels] if not os.path.exists(x)]
 
-    for g in geometries:
-
+    for (id_, type_, g) in geometries:
+        g = Polygon(g['coordinates'][0])
         naip_args = dict([('dst_crs', '4326'),
                           ('centroid', (g.centroid.y, g.centroid.x)),
                           ('buffer', 1000),
                           ('year', year)])
 
         naip = ApfoNaip(**naip_args)
-        array, profile = naip.get_image(state)
+        array, profile = naip.get_image(name_prefix)
         naip.save(array, profile, TEMP_TIF)
         naip_geometry = get_naip_polygon(naip.bbox)
         src = rasterio.open(TEMP_TIF)
 
-        vectors = [geo for geo in geometries if geo.intersects(naip_geometry)]
+        vectors = [(id_, type_, g) for geo in geometries if
+                   Polygon(geo[2]['coordinates'][0]).centroid.intersects(naip_geometry)]
+        
+        # geos = [Polygon(x[2]['coordinates'][0]).centroid for x in geometries]
+        # data = [(x[0], x[1]) for x in geometries]
+        # gpd = GeoDataFrame(data=data, geometry=geos)
+        # s_idx = list(gpd.intersection(naip_geometry))
+        # vectors = list(gpd.iloc[s_idx])
+        
         fig, ax = plt.subplots()
         rasterio.plot.show((src, 1), cmap='viridis', ax=ax)
 
-        patches = [PolygonPatch(feature, edgecolor="red", facecolor="none",
-                                linewidth=1.) for feature in vectors]
+        patches = [PolygonPatch(Polygon(geo[2]), edgecolor="red", facecolor="none",
+                                linewidth=1.) for geo in vectors]
 
         ax.add_collection(cplt.PatchCollection(patches, match_original=True))
         ax.set_xlim(naip_geometry.bounds[0], naip_geometry.bounds[2])
         ax.set_ylim(naip_geometry.bounds[1], naip_geometry.bounds[3])
 
-        name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+        name = '{}_{}'.format(name_prefix, id_)
         fig_name = os.path.join(overview, '{}.png'.format(name))
         plt.savefig(fig_name)
         plt.close(fig)
@@ -116,9 +128,9 @@ def get_training_scenes(geometries, instance_label=False, state='MT', out_dir=No
             meta.update(count=1)
 
             if instance_label:
-                label_values = [(f, i) for i, f in enumerate(vectors)]
+                label_values = [(f[2], i) for i, f in enumerate(vectors)]
             else:
-                label_values = [(f, 1) for f in vectors]
+                label_values = [(f[2], 1) for f in vectors]
 
             with rasterio.open(naip_bool_name, 'w', **meta) as out:
                 burned = rasterize(shapes=label_values, fill=0, dtype=uint8,
@@ -152,23 +164,22 @@ if __name__ == '__main__':
     #     home = remote_disk
         
     extraction = os.path.join(home, 'field_extraction')
-    # states = [('AZ', 2015), ('CA', 2018), ('CO', 2017), ('MT', 2017), ('NM', 2018),
-    #           ('NV', 2017), ('OR', 2016), ('UT', 2018), ('WY', 2017)]
-    states = [('WA', 2017)]
-    for state, year in states:
+    states = [('WA_CMICH.shp', 2017)]
+    for file_, year in states:
         # try:
+        name_prefix = file_.strip('.shp')
         out_data = os.path.join(extraction, 'field_data',
-                              'raw_data', 'states', '{}'.format(state))
+                              'raw_data', 'states', name_prefix)
         if not os.path.exists(out_data):
             os.mkdir(out_data)
         shape_dir = os.path.join(extraction, 'field_data', 'raw_shapefiles')
-        shapes = os.path.join(shape_dir, '{}_{}.shp'.format(state, year))
-        target_number = 500
+        shapes = os.path.join(shape_dir, file_)
+        target_number = 3
         if not os.path.exists(shapes):
             raise ValueError('{} does not exist'.format(shapes))
 
-        geos = get_geometries(shapes, n=5 * target_number)
-        get_training_scenes(geos, instance_label=True, state='{}'.format(state),
+        geos = get_geometries(shapes, n=target_number)
+        get_training_scenes(geos, instance_label=True, name_prefix=name_prefix,
                             out_dir=out_data, year=year, n=target_number)
         # except Exception as e:
         #     print(state, e)
