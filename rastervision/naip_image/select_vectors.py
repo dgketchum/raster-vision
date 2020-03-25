@@ -67,7 +67,7 @@ def get_naip_polygon(bbox):
 
 
 def get_training_scenes(geometries, instance_label=False, name_prefix='MT', out_dir=None,
-                        year=None, n=10, save_shp=False):
+                        year=None, n=10, save_shp=False, feature_range=None):
 
     ct = 0
 
@@ -76,6 +76,9 @@ def get_training_scenes(geometries, instance_label=False, name_prefix='MT', out_
     labels = os.path.join(out_dir, 'labels')
 
     [os.mkdir(x) for x in [overview, image, labels] if not os.path.exists(x)]
+    
+    if feature_range:
+        geometries = geometries[feature_range[0]:feature_range[1]]
 
     for (id_, type_, g) in geometries:
         try:
@@ -109,7 +112,7 @@ def get_training_scenes(geometries, instance_label=False, name_prefix='MT', out_
             ax.set_xlim(naip_geometry.bounds[0], naip_geometry.bounds[2])
             ax.set_ylim(naip_geometry.bounds[1], naip_geometry.bounds[3])
 
-            name = '{}_{}'.format(name_prefix, id_)
+            name = '{}_{}'.format(name_prefix, str(id_).rjust(7, '0'))
             if save_shp:
                 geos = [Polygon(x[2]['coordinates'][0]) for x in vectors]
                 data = [(x[0], x[1]) for x in vectors]
@@ -147,6 +150,9 @@ def get_training_scenes(geometries, instance_label=False, name_prefix='MT', out_
                     out.write(burned, 1)
                 ct += 1
                 plt.close()
+                
+            if ct > n:
+                break
 
         except ValueError as e:
             print('error {}'.format(e))
@@ -182,13 +188,13 @@ if __name__ == '__main__':
             os.mkdir(out_data)
         shape_dir = os.path.join(extraction, 'field_data', 'raw_shapefiles')
         shapes = os.path.join(shape_dir, file_)
-        target_number = 3
+        target_number = 10
         if not os.path.exists(shapes):
             raise ValueError('{} does not exist'.format(shapes))
 
         geos = get_geometries(shapes, n=target_number)
         get_training_scenes(geos, instance_label=True, name_prefix=name_prefix, out_dir=out_data, year=year,
-                            n=target_number, save_shp=False)
+                            n=target_number, save_shp=False, feature_range=(15001, 20000))
         # except Exception as e:
         #     print(state, e)
     # clean_out_training_data(tables)

@@ -93,8 +93,8 @@ def get_scene_info(_type='train'):
 
 
 if __name__ == '__main__':
-    # i = SemanticSegmentationExperiments().exp_main()
-    # rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
-    # rv.main()
-    cmd = '/home/dgketchum/field_extraction/training_data/train/washington-semseg-test/command-config-0.json'
-    rv.runner.CommandRunner.run(cmd)
+    i = SemanticSegmentationExperiments().exp_main()
+    rv.cli.main.run(['local', '--tempdir', '{}'.format(TMP)])
+    rv.main()
+    # cmd = '/home/dgketchum/field_extraction/training_data/train/washington-semseg-test/command-config-0.json'
+    # rv.runner.CommandRunner.run(cmd)
