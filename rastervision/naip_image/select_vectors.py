@@ -16,10 +16,10 @@
 
 import os
 import sys
+
 abspath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(abspath)
-import random
-import string
+import shutil
 
 from numpy import uint8
 from matplotlib import pyplot as plt
@@ -58,8 +58,9 @@ def get_geometries(shp, n=100):
             if ct > n:
                 break
             features.append((int(feat['properties']['ID']), feat['properties']['TYPE'], feat['geometry']))
+    print('{} features'.format(len(features)))
     return features
-            
+
 
 def get_naip_polygon(bbox):
     return Polygon([[bbox[0], bbox[1]], [bbox[0], bbox[3]], [bbox[2], bbox[3]],
@@ -68,7 +69,6 @@ def get_naip_polygon(bbox):
 
 def get_training_scenes(geometries, instance_label=False, name_prefix='MT', out_dir=None,
                         year=None, n=10, save_shp=False, feature_range=None):
-
     ct = 0
 
     overview = os.path.join(out_dir, 'overview')
@@ -76,7 +76,7 @@ def get_training_scenes(geometries, instance_label=False, name_prefix='MT', out_
     labels = os.path.join(out_dir, 'labels')
 
     [os.mkdir(x) for x in [overview, image, labels] if not os.path.exists(x)]
-    
+
     if feature_range:
         geometries = geometries[feature_range[0]:feature_range[1]]
 
@@ -97,9 +97,6 @@ def get_training_scenes(geometries, instance_label=False, name_prefix='MT', out_
 
             vectors = [(i, t, g) for (i, t, g) in geometries if
                        Polygon(g['coordinates'][0]).centroid.intersects(naip_geometry)]
-            
-            # s_idx = list(gpd.intersection(naip_geometry))
-            # vectors = list(gpd.iloc[s_idx])
 
             fig, ax = plt.subplots()
             rasterio.plot.show((src, 1), cmap='viridis', ax=ax)
@@ -119,7 +116,7 @@ def get_training_scenes(geometries, instance_label=False, name_prefix='MT', out_
                 gpd = GeoDataFrame(data=data, geometry=geos, columns=['id', 'TYPE'])
                 shp_name = os.path.join(overview, '{}.shp'.format(name))
                 gpd.to_file(shp_name)
-                
+
             fig_name = os.path.join(overview, '{}.png'.format(name))
             plt.savefig(fig_name)
             plt.close(fig)
@@ -130,19 +127,19 @@ def get_training_scenes(geometries, instance_label=False, name_prefix='MT', out_
                 os.remove(fig_name)
 
             else:
-                os.rename(TEMP_TIF, os.path.join(image, '{}.tif'.format(name)))
+                shutil.move(TEMP_TIF, os.path.join(image, '{}.tif'.format(name)))
                 naip_bool_name = os.path.join(labels, '{}.tif'.format(name))
-    
+
                 meta = src.meta.copy()
                 meta.update(compress='lzw')
                 meta.update(nodata=0)
                 meta.update(count=1)
-    
+
                 if instance_label:
                     label_values = [(f[2], i) for i, f in enumerate(vectors)]
                 else:
                     label_values = [(f[2], 1) for f in vectors]
-    
+
                 with rasterio.open(naip_bool_name, 'w', **meta) as out:
                     burned = rasterize(shapes=label_values, fill=0, dtype=uint8,
                                        out_shape=(array.shape[1], array.shape[2]), transform=out.transform,
@@ -150,7 +147,7 @@ def get_training_scenes(geometries, instance_label=False, name_prefix='MT', out_
                     out.write(burned, 1)
                 ct += 1
                 plt.close()
-                
+
             if ct > n:
                 break
 
@@ -164,38 +161,38 @@ def clean_out_training_data(parent_dir):
     labels = os.path.join(parent_dir, 'labels')
     image = os.path.join(parent_dir, 'image')
 
-    keep = [x[:6] for x in os.listdir(views)]
-    remove = [x for x in os.listdir(labels) if x[:6] not in keep]
+    keep = [x[:16] for x in os.listdir(views)]
+    remove = [x for x in os.listdir(labels) if x[:16] not in keep]
     [os.remove(os.path.join(labels, x)) for x in remove]
-    remove = [x for x in os.listdir(image) if x[:6] not in keep]
+    remove = [x for x in os.listdir(image) if x[:16] not in keep]
     [os.remove(os.path.join(image, x)) for x in remove]
 
 
 if __name__ == '__main__':
+    out_data = None
     home = os.path.expanduser('~')
-    # remote_disk = '/media/research/'
-    # if os.path.exists(remote_disk):
-    #     home = remote_disk
-        
-    extraction = os.path.join(home, 'field_extraction')
+    extraction = os.path.join(home, 'data', 'field_extraction')
+    if not os.path.exists(extraction):
+        extraction = os.path.join(home, 'field_extraction')
+
     states = [('WA_CMICH.shp', 2017)]
     for file_, year in states:
-        # try:
         name_prefix = file_.strip('.shp')
         out_data = os.path.join(extraction, 'field_data',
-                              'raw_data', 'states', name_prefix)
+                                'raw_data', 'states', name_prefix)
         if not os.path.exists(out_data):
             os.mkdir(out_data)
         shape_dir = os.path.join(extraction, 'field_data', 'raw_shapefiles')
         shapes = os.path.join(shape_dir, file_)
-        target_number = 10
+        target_number = 4000
         if not os.path.exists(shapes):
             raise ValueError('{} does not exist'.format(shapes))
 
-        geos = get_geometries(shapes, n=target_number)
-        get_training_scenes(geos, instance_label=True, name_prefix=name_prefix, out_dir=out_data, year=year,
-                            n=target_number, save_shp=False, feature_range=(15001, 20000))
-        # except Exception as e:
-        #     print(state, e)
-    # clean_out_training_data(tables)
+        # geos = get_geometries(shapes, n=target_number)
+        # get_training_scenes(geos, instance_label=True, name_prefix=name_prefix,
+        #                     out_dir=out_data, year=year,
+        #                     n=target_number, save_shp=False,
+        #                     feature_range=(166809, 170000))
+    tables = os.path.join(out_data)
+    clean_out_training_data(tables)
 # ========================= EOF ====================================================================

@@ -10,7 +10,7 @@ from torchvision.models.detection.backbone_utils import resnet_fpn_backbone
 from torchvision.models.detection.mask_rcnn import MaskRCNN
 from torchvision.models.utils import load_state_dict_from_url
 from torchvision.transforms import ToTensor
-from viz import display_instances
+from rastervision.viz import display_instances
 
 model_urls = {'maskrcnn_resnet50_fpn_coco':
               'https://download.pytorch.org/models/maskrcnn_resnet50_fpn_coco-bf2d0c1e.pth'}
@@ -53,6 +53,10 @@ def train(model, load_dataset):
         print(loss)
 
 
+def validate():
+    pass
+
+
 def visualize(model, images, max_images):
     ct = 0
     device = torch.device("cuda:0")
@@ -71,10 +75,12 @@ def visualize(model, images, max_images):
         img = arr[0].permute(1, 2, 0).cpu().numpy()
         class_ids = np.array([x for x in range(len(labels))])
         class_names = [str(x) for x in labels]
+        out_image = os.path.join(out_dir_, os.path.basename(image))
         display_instances(im, boxes=boxes, masks=masks,
                           class_ids=class_ids,
                           class_names=class_names,
-                          show_mask=True, show_bbox=True)
+                          show_mask=True, show_bbox=True,
+                          save_fig=out_image)
         ct += 1
         if ct >= max_images:
             break
@@ -82,5 +88,5 @@ def visualize(model, images, max_images):
 
 if __name__ == '__main__':
     model = get_model()
-    visualize(model, images, max_images=3)
+    visualize(model, images, max_images=30)
 # ========================= EOF ====================================================================
